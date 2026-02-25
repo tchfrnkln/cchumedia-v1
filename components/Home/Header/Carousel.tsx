@@ -81,3 +81,60 @@ export default function AutoCarousel() {
     </div>
   );
 }
+
+const images = [
+  "/images/Table.jpg",
+  "/images/Shirts.jpg",
+  "/images/Signage.jpg",
+];
+
+export const AutoSlideshow = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 4000); // change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative w-90 h-100 overflow-hidden rounded-box shadow-xl">
+      {images.map((src, idx) => (
+        <div
+          key={src}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            idx === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Image
+            src={src}
+            alt={`Slide ${idx + 1}`}
+            fill
+            className="object-cover"
+            priority={idx === 0}           // load first image eagerly
+            sizes="192px"                  // w-48 = 12rem = 192px at default density
+            quality={85}                   // good balance of quality/size
+          />
+        </div>
+      ))}
+
+      {/* Optional: indicator dots */}
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">
+        {images.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-2 w-2 rounded-full transition-all ${
+              idx === currentIndex
+                ? "bg-white scale-125 shadow-sm"
+                : "bg-white/50 hover:bg-white/80"
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
