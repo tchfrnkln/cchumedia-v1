@@ -7,6 +7,15 @@ const Hero = () => {
 
     const whatapp = "https://wa.me/2348052929523?text=Hello%20C-CHU%20Media%2C%20My%20name%20is"
 
+    const services = [
+        "Photography & Cinematography",
+        "Web & Graphic Design",
+        "Print & Publication",
+        "Branding & Identity",
+        "Digital Marketing",
+        "Social Media Management"
+    ]
+
   return (
     <div className="max-w-screen w-full hero bg-[#9B96C8] min-h-screen text-[#2A2840]">
         <div className="hero-content flex-col lg:flex-row md:px-24">
@@ -18,10 +27,11 @@ const Hero = () => {
                     <h1 className="text-2xl md:text-5xl font-bold">C-Chu Media</h1>
                     <span className="text-rotate text-3xl md:text-4xl leading-loose font-bold text-[#DCD8EF]">
                         <span>
-                            <span className="bg-teal-400  px-2 rounded-2xl">Photography</span>
-                            <span className="bg-red-400 px-2 rounded-2xl">Cinematography</span>
+                            <span className="bg-red-400 px-2 rounded-2xl">Photography & Cinematography</span>
                             <span className="bg-blue-400 px-2 rounded-2xl">Web & Graphic Design</span>
                             <span className="bg-indigo-400 px-2 rounded-2xl">Print & Publication</span>
+                            <span className="bg-teal-400 px-2 rounded-2xl">Digital Marketing</span>
+                            <span className="bg-orange-400 px-2 rounded-2xl">Social Media Management</span>
                         </span>
                     </span>
                 </div>
