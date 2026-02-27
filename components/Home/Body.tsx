@@ -54,7 +54,7 @@ const Body = () => {
                                 <p className='font-bold md:text-lg'>{image.name}</p>
                                 <p className="text-xs">{image.description}</p>
                             </div>
-                            <p className='font-bold md:text-lg text-[#7F1D1D] underline'>₦{image.price}+</p>
+                            <p className='font-bold md:text-lg text-green-600 underline'>₦{image.price}+</p>
                         </div>
                     </div>
                 ))}
