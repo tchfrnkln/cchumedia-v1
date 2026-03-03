@@ -20,7 +20,13 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSuccess: (success: string | null) => void;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    fullName: string,
+    gender: string,
+    location: string
+  ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -36,14 +42,35 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   setSuccess: (success) => set({ success }),
-  signup: async (email, password) => {
-    set({ isLoading: true, error: null });
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  signup: async (email, password, fullName, gender, location) => {
+    set({ isLoading: true, error: null, success: null });
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName.trim(),
+          gender: gender.trim(),
+          location: location.trim(),
+          // You can add more fields here later
+        },
+      },
+    });
+
     if (error) {
-      set({ error: error.message });
+      set({ error: error.message, isLoading: false });
       throw error;
     }
-    set({ user: data.user as User, session: data.session, isLoading: false, success: "Successfully signed up!" });
+
+    // Optional: you can set user/session here if you want immediate state update
+    // But usually better to rely on onAuthStateChange listener
+    set({
+      // user: data.user,
+      // session: data.session,
+      isLoading: false,
+      success: 'Account created! Check your email to confirm.',
+    });
   },
   login: async (email, password) => {
     set({ isLoading: true, error: null });

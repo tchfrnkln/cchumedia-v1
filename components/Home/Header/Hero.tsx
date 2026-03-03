@@ -7,14 +7,14 @@ const Hero = () => {
 
     const whatapp = "https://wa.me/2348052929523?text=Hello%20C-CHU%20Media%2C%20My%20name%20is"
 
-    const services = [
-        "Photography & Cinematography",
-        "Web & Graphic Design",
-        "Print & Publication",
-        "Branding & Identity",
-        "Digital Marketing",
-        "Social Media Management"
-    ]
+    // const services = [
+    //     "Photography & Cinematography",
+    //     "Web & Graphic Design",
+    //     "Print & Publication",
+    //     "Branding & Identity",
+    //     "Digital Marketing",
+    //     "Social Media Management"
+    // ]
 
   return (
     <div className="max-w-screen w-full hero bg-[#9B96C8] min-h-screen text-[#2A2840]">

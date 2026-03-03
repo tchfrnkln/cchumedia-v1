@@ -2,6 +2,7 @@
 'use client';
 
 import { useAuthStore } from '@/store/authStore';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function LoginPage() {
@@ -57,6 +58,13 @@ export default function LoginPage() {
               <button className="btn btn-primary" type="submit" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </button>
+            </div>
+
+            <div className="text-center mt-4 text-sm">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth" className="link link-primary">
+                Sign up
+              </Link>
             </div>
           </form>
         </div>
