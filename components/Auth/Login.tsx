@@ -62,7 +62,7 @@ export default function LoginPage() {
 
             <div className="text-center mt-4 text-sm">
               Don&apos;t have an account?{' '}
-              <Link href="/auth" className="link link-primary">
+              <Link href="/auth/new" className="link link-primary">
                 Sign up
               </Link>
             </div>
