@@ -251,33 +251,66 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+            {/* Cart Drawer – Fully controlled */}
+        <div className="drawer drawer-end z-50">
+            <input
+                id="cart-drawer"
+                type="checkbox"
+                className="drawer-toggle"
+                checked={showCartDrawer}
+                onChange={(e) => setShowCartDrawer(e.target.checked)} 
+            />
+            <div className="drawer-content">
+                {/* Your main page content is here – no change needed */}
+            </div>
 
-        {/* Cart Drawer */}
-        <input type="checkbox" id="cart-drawer" className="drawer-toggle" checked={showCartDrawer} onChange={() => setShowCartDrawer(!showCartDrawer)} />
-        <div className="drawer drawer-end">
-          <div className="drawer-side">
-            <label htmlFor="cart-drawer" className="drawer-overlay"></label>
-            <ul className="menu p-4 w-80 h-full bg-base-200 text-base-content">
-              <h2 className="text-xl font-bold mb-4">Your Cart</h2>
-              {items.length === 0 ? (
-                <p>Cart is empty.</p>
-              ) : (
-                items.map((item) => (
-                  <li key={item.productId} className="mb-2">
-                    <div>
-                      <span>{item.name} x {item.quantity}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+            <div className="drawer-side">
+                <label
+                htmlFor="cart-drawer"
+                aria-label="close sidebar"
+                className="drawer-overlay"
+                onClick={() => setShowCartDrawer(false)} 
+                ></label>
+
+                <ul className="menu p-4 w-80 h-full bg-base-200 text-base-content">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Your Cart</h2>
+                    <button
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => setShowCartDrawer(false)}
+                    >
+                    ✕
+                    </button>
+                </div>
+
+                {items.length === 0 ? (
+                    <p className="text-center py-8">Cart is empty.</p>
+                ) : (
+                    items.map((item) => (
+                    <li key={item.productId} className="mb-3 border-b pb-2">
+                        <div className="flex justify-between">
+                        <span>{item.name} × {item.quantity}</span>
+                        <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    </li>
+                    ))
+                )}
+
+                {items.length > 0 && (
+                    <div className="mt-6">
+                    <button
+                        className="btn btn-outline w-full"
+                        onClick={() => {
+                        useCartStore.getState().clearCart();
+                        // Optional: toast.success('Cart cleared');
+                        }}
+                    >
+                        Clear Cart
+                    </button>
                     </div>
-                  </li>
-                ))
-              )}
-              <div className="mt-4">
-                <button className="btn btn-outline w-full" onClick={() => useCartStore.getState().clearCart()}>
-                  Clear Cart
-                </button>
-              </div>
-            </ul>
-          </div>
+                )}
+                </ul>
+            </div>
         </div>
       </div>
     </div>
