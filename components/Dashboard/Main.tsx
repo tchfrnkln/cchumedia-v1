@@ -90,7 +90,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 p-4">
+    <div className="w-full min-h-screen bg-base-200 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="md:text-3xl font-bold">All Products</h1>
