@@ -24,7 +24,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-base-200">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
-          <h1 className="card-title">Log In</h1>
+          <h1 className="card-title text-2xl justify-center py-4">Log In</h1>
           <form onSubmit={handleLogin}>
             <div className="form-control">
               <label className="label">

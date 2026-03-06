@@ -39,9 +39,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="md:flex items-center justify-center bg-base-100 md:bg-base-200 py-24">
-      <div className="w-[80%] md:w-3/5 bg-base-100 md:shadow-xl rounded-lg p-4">
-        <div className="w-full md:p-4 md:px-24">
+    <div className="w-full md:flex items-center justify-center bg-base-100 md:bg-base-200 py-24">
+      <div className="w-full md:w-3/5 bg-base-100 md:shadow-xl rounded-lg p-4 flex justify-center items-center">
+        <div className="w-full px-8 md:p-4 md:px-24">
           <h1 className="card-title text-2xl justify-center py-4">Sign up</h1>
 
           <form onSubmit={handleSignup} className="space-y-4">
@@ -53,7 +53,7 @@ export default function SignupPage() {
               <input
                 type="text"
                 placeholder="John Doe"
-                className="input input-bordered w-2/3"
+                className="input input-bordered md:w-2/3"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -68,7 +68,7 @@ export default function SignupPage() {
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="input input-bordered w-2/3"
+                className="input input-bordered md:w-2/3"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -81,7 +81,7 @@ export default function SignupPage() {
                 <span className="label-text text-xs">Gender</span>
               </label>
               <select
-                className="select select-bordered w-2/3"
+                className="select select-bordered md:w-2/3"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 required
@@ -103,7 +103,7 @@ export default function SignupPage() {
               <input
                 type="text"
                 placeholder="Abuja"
-                className="input input-bordered w-2/3"
+                className="input input-bordered md:w-2/3"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 required
@@ -118,7 +118,7 @@ export default function SignupPage() {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="input input-bordered w-2/3"
+                className="input input-bordered md:w-2/3"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -133,7 +133,7 @@ export default function SignupPage() {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="input input-bordered w-2/3"
+                className="input input-bordered md:w-2/3"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -167,6 +167,7 @@ export default function SignupPage() {
               Login
             </Link>
           </div>
+
         </div>
       </div>
     </div>

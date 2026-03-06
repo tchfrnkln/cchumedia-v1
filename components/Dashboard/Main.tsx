@@ -90,7 +90,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-base-200 p-4">
+    <div className="w-full min-h-screen bg-base-200 p-4 pt-24">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="md:text-3xl font-bold">All Products</h1>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                 <div className="card-body">
                   <h2 className="card-title">{product.name}</h2>
                   <p>{product.description || 'No description'}</p>
-                  <p className="font-bold hidden">${product.price.toFixed(2)}</p>
+                  <p className="font-bold hidden">₦{product.price.toFixed(2)}</p>
                   <div className="card-actions justify-end">
                     <button
                       className="btn btn-primary"
@@ -290,7 +290,7 @@ export default function Dashboard() {
                     <li key={item.productId} className="mb-3 border-b pb-2">
                         <div className="flex justify-between">
                         <span>{item.name} × {item.quantity}</span>
-                        <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-semibold">₦{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                     </li>
                     ))
