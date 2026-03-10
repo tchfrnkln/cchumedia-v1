@@ -10,6 +10,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  order: number;
   image_url: string | null;
 }
 
@@ -18,8 +19,8 @@ interface ProductState {
   isLoading: boolean;
   error: string | null;
   fetchProducts: () => Promise<void>;
-  addProduct: (name: string, description: string, price: number, image: File | null) => Promise<void>;
-  updateProduct: (id: string, name: string, description: string, price: number, image: File | null) => Promise<void>;
+  addProduct: (name: string, description: string, price: number, order: number, image: File | null) => Promise<void>;
+  updateProduct: (id: string, name: string, description: string, price: number, order: number, image: File | null) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
 }
 
@@ -37,7 +38,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
     set({ products: data as Product[], isLoading: false });
   },
-  addProduct: async (name, description, price, image) => {
+  addProduct: async (name, description, price, order, image) => {
     set({ isLoading: true, error: null });
     let image_url: string | null = null;
     if (image) {
@@ -52,7 +53,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
       const { data: urlData } = supabase.storage.from('products').getPublicUrl(filePath);
       image_url = urlData.publicUrl;
     }
-    const { error } = await supabase.from('products').insert({ name, description, price, image_url });
+    const { error } = await supabase.from('products').insert({ name, description, price, order, image_url });
     if (error) {
       set({ error: error.message, isLoading: false });
       toast.error(error.message);
@@ -63,7 +64,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     set({ isLoading: false });
     toast.success('Product added!');
   },
-  updateProduct: async (id, name, description, price, image) => {
+  updateProduct: async (id, name, description, price, order, image) => {
     set({ isLoading: true, error: null });
     let image_url: string | null = null;
     const existing = get().products.find((p) => p.id === id);

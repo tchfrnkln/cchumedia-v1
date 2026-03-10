@@ -19,10 +19,11 @@ export default function Dashboard() {
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showCartDrawer, setShowCartDrawer] = useState<boolean>(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<{ name: string; description: string; price: number; image: File | null }>({
+  const [formData, setFormData] = useState<{ name: string; description: string; price: number; order: number; image: File | null }>({
     name: '',
     description: '',
     price: 0,
+    order: 0,
     image: null,
   });
 
@@ -52,9 +53,9 @@ export default function Dashboard() {
     };
 
   const handleAdd = async () => {
-    await addProduct(formData.name, formData.description, formData.price, formData.image);
+    await addProduct(formData.name, formData.description, formData.price, formData.order, formData.image);
     setShowAddModal(false);
-    setFormData({ name: '', description: '', price: 0, image: null });
+    setFormData({ name: '', description: '', price: 0, order: 0, image: null });
   };
 
   const handleEdit = (product: Product) => {
@@ -63,6 +64,7 @@ export default function Dashboard() {
       name: product.name,
       description: product.description || '',
       price: product.price,
+      order: product.order,
       image: null,
     });
     setShowEditModal(true);
@@ -70,7 +72,7 @@ export default function Dashboard() {
 
   const handleUpdate = async () => {
     if (!editProduct) return;
-    await updateProduct(editProduct.id, formData.name, formData.description, formData.price, formData.image);
+    await updateProduct(editProduct.id, formData.name, formData.description, formData.price, formData.order, formData.image);
     setShowEditModal(false);
     setEditProduct(null);
   };
@@ -145,13 +147,8 @@ export default function Dashboard() {
                   <p>{product.description || 'No description'}</p>
                   <p className="font-bold hidden">₦{product.price.toFixed(2)}</p>
                   <div className="card-actions justify-end">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => addToCart(product.id, product.name, product.price)}
-                    >
-                      Order Now
-                    </button>
-                    {isAdminOrStaff && (
+                    
+                    {isAdminOrStaff ? (
                       <>
                         <button className="btn btn-outline" onClick={() => handleEdit(product)}>
                           <Edit size={16} />
@@ -160,7 +157,13 @@ export default function Dashboard() {
                           <Trash2 size={16} />
                         </button>
                       </>
-                    )}
+                    ):
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => addToCart(product.id, product.name, product.price)}
+                    >
+                      Order Now
+                    </button>}
                   </div>
                 </div>
               </div>
@@ -190,12 +193,23 @@ export default function Dashboard() {
                 value={formData.description}
                 onChange={handleFormChange}
               />
+              {/* <p>Price</p> */}
               <input
                 type="number"
                 name="price"
                 placeholder="Price"
                 className="input input-bordered w-full"
                 value={formData.price}
+                onChange={handleFormChange}
+                required
+              />
+              {/* <p>min. Order</p> */}
+              <input
+                type="number"
+                name="order"
+                placeholder="min. Order"
+                className="input input-bordered w-full"
+                value={formData.order}
                 onChange={handleFormChange}
                 required
               />
