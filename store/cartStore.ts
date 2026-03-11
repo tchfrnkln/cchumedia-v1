@@ -1,123 +1,141 @@
-// src/lib/stores/cartStore.ts
 'use client';
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import toast from 'react-hot-toast';
-import { cookieStorage } from './customCookieStorage';
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import toast from 'react-hot-toast'
+import { cookieStorage } from './customCookieStorage'
 
-interface CartItem {
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  specs?: Record<string, string>;
+/* ---------------- DESIGN ---------------- */
+
+export interface DesignDetails {
+  type: 'have-design' | 'design-for-me' | null
+
+  designFile?: File | null
+
+  businessName?: string
+  description?: string
+
+  logo?: File | null
+  noLogo?: boolean
 }
 
+/* ---------------- CART ITEM ---------------- */
+
+export interface CartItem {
+  cartItemId: string
+
+  productId: string 
+  name: string | undefined
+  price: number | undefined
+  quantity: number
+
+  specs?: Record<string, string>
+
+  design?: DesignDetails
+}
+
+/* ---------------- STORE ---------------- */
+
 interface CartState {
-  items: CartItem[];
+  items: CartItem[]
 
   addToCart: (
     productId: string,
     name: string,
     price: number,
     quantity?: number,
-    specs?: Record<string, string>
-  ) => void;
+    specs?: Record<string, string>,
+    design?: DesignDetails
+  ) => void
 
-  removeFromCart: (productId: string, specs?: Record<string, string>) => void;
+  removeFromCart: (cartItemId: string) => void
 
-  updateQuantity: (
-    productId: string,
-    quantity: number,
-    specs?: Record<string, string>
-  ) => void;
+  updateQuantity: (cartItemId: string, quantity: number) => void
 
-  clearCart: () => void;
+  clearCart: () => void
 }
 
-/* Helper to compare specs */
-const specsEqual = (
-  a?: Record<string, string>,
-  b?: Record<string, string>
-) => {
-  return JSON.stringify(a || {}) === JSON.stringify(b || {});
-};
+/* ---------------- UTILS ---------------- */
+
+const generateCartItemId = () => {
+  return crypto.randomUUID()
+}
+
+/* ---------------- STORE ---------------- */
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
+
       items: [],
+
+      /* ---------- ADD TO CART ---------- */
 
       addToCart: (
         productId,
         name,
         price,
         quantity = 1,
-        specs = {}
+        specs = {},
+        design
       ) => {
 
-        const existing = get().items.find(
-          (item) =>
-            item.productId === productId &&
-            specsEqual(item.specs, specs)
-        );
-
-        if (existing) {
-          set({
-            items: get().items.map((item) =>
-              item.productId === productId &&
-              specsEqual(item.specs, specs)
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            ),
-          });
-        } else {
-          set({
-            items: [
-              ...get().items,
-              { productId, name, price, quantity, specs },
-            ],
-          });
+        const newItem: CartItem = {
+          cartItemId: generateCartItemId(),
+          productId,
+          name,
+          price,
+          quantity,
+          specs,
+          design
         }
 
-        toast.success('Added to cart!');
+        set({
+          items: [...get().items, newItem]
+        })
+
+        toast.success('Added to cart!')
       },
 
-      removeFromCart: (productId, specs) => {
+      /* ---------- REMOVE ITEM ---------- */
+
+      removeFromCart: (cartItemId) => {
+
         set({
           items: get().items.filter(
-            (item) =>
-              !(
-                item.productId === productId &&
-                specsEqual(item.specs, specs)
-              )
-          ),
-        });
+            (item) => item.cartItemId !== cartItemId
+          )
+        })
 
-        toast.success('Removed from cart');
+        toast.success('Removed from cart')
       },
 
-      updateQuantity: (productId, quantity, specs) => {
-        if (quantity < 1)
-          return get().removeFromCart(productId, specs);
+      /* ---------- UPDATE QUANTITY ---------- */
+
+      updateQuantity: (cartItemId, quantity) => {
+
+        if (quantity < 1) {
+          return get().removeFromCart(cartItemId)
+        }
 
         set({
           items: get().items.map((item) =>
-            item.productId === productId &&
-            specsEqual(item.specs, specs)
+            item.cartItemId === cartItemId
               ? { ...item, quantity }
               : item
-          ),
-        });
+          )
+        })
       },
 
-      clearCart: () => set({ items: [] }),
+      /* ---------- CLEAR CART ---------- */
+
+      clearCart: () => set({ items: [] })
+
     }),
 
     {
       name: 'cart-storage',
-      storage: createJSONStorage(() => cookieStorage),
+      storage: createJSONStorage(() => cookieStorage)
     }
   )
-);
+)

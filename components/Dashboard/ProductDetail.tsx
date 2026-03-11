@@ -6,11 +6,12 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 
 import { useProductStore } from '@/store/productStore';
-import { useCartStore } from '@/store/cartStore';
 import { useProductDetailStore } from '@/store/productDetailStore';
 
 import CartDrawer, { Cart } from './CartDrawer';
 import { useEffect } from 'react';
+import { useDesignPopoverStore } from '@/store/popOver';
+import DesignPopover from './PopOver';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -18,18 +19,16 @@ export default function ProductDetailPage() {
   const productId = params.id as string;
 
   const { products, isLoading: productsLoading } = useProductStore();
-  const { addToCart } = useCartStore();
 
   const {
     setQuantity,
     getQuantity,
     setDefaultSpecs,
-    clearQuantity,
     setSpec,
     getSpec,
-    getAllSpecs,
-    clearSpecs,
   } = useProductDetailStore();
+
+  const { openPopover } = useDesignPopoverStore();
 
   const product = products.find((p) => p.id === productId);
 
@@ -79,23 +78,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleAddToCart = () => {
-    const specs = getAllSpecs(productId);
-
-    addToCart(
-      product.id,
-      product.name,
-      product.price,
-      quantity,
-      specs
-    );
-
-    toast.success(`Added ${quantity} × ${product.name} to cart`);
-
-    clearQuantity(productId);
-    clearSpecs(productId);
-  };
-
   return (
     <div className="w-full pt-24">
 
@@ -138,7 +120,8 @@ export default function ProductDetailPage() {
 
           <button
             className="hidden md:flex w-75 mt-4 btn btn-primary btn-lg flex-1 gap-2 text-xs p-4"
-            onClick={handleAddToCart}
+            // onClick={handleAddToCart}
+            onClick={openPopover}
             disabled={quantity < minQty}
           >
             <ShoppingCart size={20} />
@@ -295,7 +278,8 @@ export default function ProductDetailPage() {
 
             <button
               className="btn btn-primary btn-lg flex-1 gap-2 text-xs p-4"
-              onClick={handleAddToCart}
+              // onClick={handleAddToCart}
+              onClick={openPopover}
               disabled={quantity < minQty}
             >
               <ShoppingCart size={20} />
@@ -309,6 +293,7 @@ export default function ProductDetailPage() {
       </div>
 
       <CartDrawer />
+      <DesignPopover id={product.id}/>
 
     </div>
   );
