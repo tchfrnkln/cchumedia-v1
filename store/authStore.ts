@@ -25,7 +25,8 @@ interface AuthState {
     password: string,
     fullName: string,
     gender: string,
-    location: string
+    location: string,
+    affiliateId: string | null,
   ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -42,7 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   setSuccess: (success) => set({ success }),
-  signup: async (email, password, fullName, gender, location) => {
+  signup: async (email, password, fullName, gender, location, affiliateId) => {
     set({ isLoading: true, error: null, success: null });
 
     const { error } = await supabase.auth.signUp({
@@ -53,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           full_name: fullName.trim(),
           gender: gender.trim(),
           location: location.trim(),
+          affiliate_id: affiliateId,
           // You can add more fields here later
         },
       },

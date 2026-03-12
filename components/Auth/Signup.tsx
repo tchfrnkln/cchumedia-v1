@@ -4,8 +4,13 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const affiliateId = searchParams.get('aff');
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -15,7 +20,7 @@ export default function SignupPage() {
 
   const { signup, isLoading, error, success } = useAuthStore();
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -30,9 +35,11 @@ export default function SignupPage() {
     }
 
     try {
-      await signup(email, password, fullName, gender, location);
+      await signup(email, password, fullName, gender, location, affiliateId);
       // Optional: clear form or redirect after success
       // window.location.href = '/login'; // or show success message only
+
+      router.push("/auth")
     } catch {
       // error is already set in store
     }

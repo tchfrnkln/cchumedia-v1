@@ -49,6 +49,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     checkout.updateDeliveryFee();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout.shippingMethod, checkout.state]);
 
   const reference = useMemo(() => {
@@ -126,8 +127,8 @@ export default function CheckoutPage() {
       clearCart();
       setIsModalOpen(false);
 
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Redirect to Order Page
+      router.push('/orders');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
