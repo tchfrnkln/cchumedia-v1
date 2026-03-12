@@ -1,6 +1,7 @@
 import { useCartStore } from '@/store/cartStore';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { ShoppingCart } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react'
 
 const CartDrawer = () => {
@@ -63,7 +64,9 @@ const CartDrawer = () => {
                   </span>
 
                   <span className="font-semibold">
-                    ₦{Number((item.price * item.quantity).toFixed(2)).toLocaleString()}
+                    {
+                      item.price && `₦${Number((item?.price * item.quantity).toFixed(2)).toLocaleString()}`
+                    }
                   </span>
                 </div>
 
@@ -91,13 +94,19 @@ const CartDrawer = () => {
             <div className="mt-6">
 
               <button
-                className="btn btn-outline w-full"
+                className="btn btn-outline w-full mb-6"
                 onClick={() =>
                   useCartStore.getState().clearCart()
                 }
               >
                 Clear Cart
               </button>
+
+              <Link href="/checkout">
+                <button className="btn btn-primary w-full max-w-xs">
+                  Proceed to Checkout
+                </button>
+              </Link>
 
             </div>
           )}

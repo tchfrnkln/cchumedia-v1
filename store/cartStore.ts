@@ -10,12 +10,12 @@ import { cookieStorage } from './customCookieStorage'
 export interface DesignDetails {
   type: 'have-design' | 'design-for-me' | null
 
-  designFile?: File | null
+  designFile?: string | null
 
   businessName?: string
   description?: string
 
-  logo?: File | null
+  logo?: string | null
   noLogo?: boolean
 }
 
