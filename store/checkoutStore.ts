@@ -1,4 +1,3 @@
-// stores/checkoutStore.ts
 'use client';
 
 import { create } from 'zustand';
@@ -21,7 +20,6 @@ export interface CheckoutState {
   updateDeliveryFee: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NIGERIAN_STATES = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
   'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'Gombe', 'Imo', 'Jigawa',
@@ -30,26 +28,28 @@ const NIGERIAN_STATES = [
   'Zamfara', 'Federal Capital Territory (FCT)',
 ] as const;
 
+// Updated delivery fees — cheaper for Abuja/FCT since store is there
 const deliveryFees: Record<string, number> = {
-  'Lagos': 1000,
-  'Federal Capital Territory (FCT)': 2000,
-  'Abuja': 2000,           // alias
-  'Ogun': 1200,
-  'Oyo': 1500,
-  'Osun': 1500,
-  'Ondo': 1500,
-  'Ekiti': 1500,
-  'Abia': 1500,
-  'Anambra': 1500,
-  'Imo': 1500,
-  'Enugu': 1500,
-  'Ebonyi': 1800,
-  'Delta': 1500,
-  'Rivers': 1500,
-  'Cross River': 1800,
-  'Akwa Ibom': 1800,
-  // Add the rest according to your real pricing policy
-  // Most others default to a mid-range value
+  'Federal Capital Territory (FCT)': 800,    // ← Much cheaper for local Abuja deliveries
+  'Abuja': 800,                              // alias
+  'Nasarawa': 1200,                          // nearby state
+  'Niger': 1400,                             // nearby
+  'Lagos': 2500,                             // farther, increased a bit for realism
+  'Ogun': 2200,
+  'Oyo': 2800,
+  'Osun': 3000,
+  'Ondo': 3000,
+  'Ekiti': 3000,
+  'Abia': 3500,
+  'Anambra': 3500,
+  'Imo': 3500,
+  'Enugu': 3500,
+  'Ebonyi': 3800,
+  'Delta': 3500,
+  'Rivers': 3800,
+  'Cross River': 4000,
+  'Akwa Ibom': 4000,
+  // Add more as needed — distant ones can stay higher
 } as const;
 
 const DEFAULT_STATE: Omit<CheckoutState, 'setField' | 'reset' | 'updateDeliveryFee'> = {
@@ -60,8 +60,8 @@ const DEFAULT_STATE: Omit<CheckoutState, 'setField' | 'reset' | 'updateDeliveryF
   shippingMethod: 'home',
   address1: '',
   address2: '',
-  state: 'Lagos',
-  deliveryFee: 1000,
+  state: 'Federal Capital Territory (FCT)',  // ← Changed default to FCT/Abuja
+  deliveryFee: 800,
 };
 
 export const useCheckoutStore = create<CheckoutState>((set, get) => ({
@@ -80,8 +80,12 @@ export const useCheckoutStore = create<CheckoutState>((set, get) => ({
     }
 
     // Normalize common variations
-    const normalized = state === 'Abuja' ? 'Federal Capital Territory (FCT)' : state;
-    const fee = deliveryFees[normalized] ?? 1800; // fallback for unlisted states
+    let normalized = state;
+    if (state === 'Abuja') {
+      normalized = 'Federal Capital Territory (FCT)';
+    }
+
+    const fee = deliveryFees[normalized] ?? 2500; // fallback — raised slightly for distant/unlisted
 
     set({ deliveryFee: fee });
   },

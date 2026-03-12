@@ -1,21 +1,21 @@
-// components/Dashboard/CheckOut.tsx
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Backpack,
   ChevronDown,
   Mail,
   MapPin,
   Package,
   Phone,
   ShoppingCart,
-  User,
+  User
 } from 'lucide-react';
 import { PaystackButton } from 'react-paystack';
 import { useCartStore } from '@/store/cartStore';
 import { useCheckoutStore } from '@/store/checkoutStore';
-import { supabase } from '@/lib/supabase/client'; // your initialized client
+import { supabase } from '@/lib/supabase/client';
 
 const nigerianStates = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
@@ -41,9 +41,28 @@ export default function CheckoutPage() {
     state.items.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0)
   );
 
-  const tax = Math.round(subtotal * 0.08);
+  // ── UPDATED: Custom design fee = 5000 per distinct item that needs design-for-me ──
+  const CUSTOM_DESIGN_FEE = 5000;
+
+  const customDesignFee = useMemo(() => {
+    // Count unique cart items (by productId + design fingerprint) that require custom design
+    const designItems = cartItems.filter((item) => item.design?.type === 'design-for-me');
+
+    // If your cart allows duplicate productId with different designs, use a better key
+    // For most stores → productId + JSON.stringify(design) is safer
+    const uniqueDesignKeys = new Set(
+      designItems.map((item) => {
+        // If design can differ per line item → use both product + design content
+        return `${item.productId}-${JSON.stringify(item.design ?? {})}`;
+      })
+    );
+
+    return uniqueDesignKeys.size * CUSTOM_DESIGN_FEE;
+  }, [cartItems]);
+
+  const tax = Math.round(subtotal * 0.075);
   const { deliveryFee } = useCheckoutStore();
-  const total = subtotal + tax + deliveryFee;
+  const total = subtotal + tax + deliveryFee + customDesignFee;
 
   const checkout = useCheckoutStore();
 
@@ -69,7 +88,6 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error("Please sign in to complete your order");
@@ -92,6 +110,7 @@ export default function CheckoutPage() {
           subtotal,
           tax_amount: tax,
           delivery_fee: deliveryFee,
+          custom_design_fee: customDesignFee,     // now correct amount
           total_amount: total,
           status: 'paid',
         })
@@ -102,7 +121,7 @@ export default function CheckoutPage() {
         throw orderError || new Error("Failed to create order");
       }
 
-      // 2. Insert order items
+      // 2. Insert order items (unchanged)
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_id: item.productId,
@@ -121,22 +140,19 @@ export default function CheckoutPage() {
         throw itemsError;
       }
 
-      // Success
       alert(`Payment successful!\nOrder created (ID: ${order.id})`);
 
       clearCart();
       setIsModalOpen(false);
 
-      // Redirect to Order Page
       router.push('/orders');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Order creation failed:", err);
       alert(
         `Payment was successful, but we couldn't save your order.\n` +
         `Please contact support with reference: ${paystackReference}\n` +
-        `Error: ${err.message || 'Unknown error'}`
+        `Error: ${ (err as Error).message || 'Unknown error' }`
       );
     } finally {
       setIsSubmitting(false);
@@ -146,7 +162,7 @@ export default function CheckoutPage() {
   const paystackConfig = {
     reference,
     email: checkout.email.trim(),
-    amount: Math.round(total * 100),
+    amount: Math.round(total * 100),          // includes corrected customDesignFee
     publicKey: 'pk_test_a361ebecc9edf1b3af278b0b42e9b037a668c872',
     currency: 'NGN',
     firstname: checkout.firstName.trim(),
@@ -182,7 +198,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center mt-24">
+    <div className="min-h-screen p-6 flex flex-col items-center">
       {/* Order Summary Card */}
       <div className="card bg-base-100 shadow-xl w-full max-w-2xl mb-8">
         <div className="card-body">
@@ -205,6 +221,9 @@ export default function CheckoutPage() {
                     <div>
                       <p className="font-medium">{item.name || 'Unnamed product'}</p>
                       <p className="text-sm opacity-70">Qty: {item.quantity}</p>
+                      {item.design?.type === 'design-for-me' && (
+                        <p className="text-xs text-info">+ Custom Design</p>
+                      )}
                     </div>
                     <p className="font-medium text-right">
                       ₦{((item.price ?? 0) * item.quantity).toLocaleString()}
@@ -219,13 +238,21 @@ export default function CheckoutPage() {
                   <span>₦{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>VAT (8%)</span>
+                  <span>VAT (7.5%)</span>
                   <span>₦{tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Fee to {checkout.state}</span>
                   <span>₦{deliveryFee.toLocaleString()}</span>
                 </div>
+
+                {customDesignFee > 0 && (
+                  <div className="flex justify-between text-info">
+                    <span>Custom Design Fee</span>
+                    <span>₦{customDesignFee.toLocaleString()}</span>
+                  </div>
+                )}
+
                 <div className="divider my-3"></div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
@@ -249,7 +276,14 @@ export default function CheckoutPage() {
 
       {/* Checkout Information Modal */}
       <div className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
-        <div className="modal-box max-w-lg w-11/12">
+        <div className="relative modal-box max-w-lg w-11/12">
+          <div
+            onClick={() => setIsModalOpen(!isModalOpen)}
+            className="absolute right-4 top-4 btn btn-ghost p-4 rounded-full text-xs cursor-pointer"
+          >
+            <Backpack size={16} /> Summary
+          </div>
+
           <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
             <User size={24} /> Checkout Information
           </h3>

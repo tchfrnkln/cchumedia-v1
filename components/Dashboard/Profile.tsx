@@ -46,7 +46,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen p-6 mt-24">
+    <div className="min-h-screen p-6">
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Profile Card */}
         <div className="card bg-base-100 shadow-xl">

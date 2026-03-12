@@ -51,7 +51,7 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="w-full min-h-screen bg-base-200 p-4 pt-24">
+    <div className="w-full min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}

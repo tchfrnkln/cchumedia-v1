@@ -79,7 +79,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="w-full pt-24">
+    <div className="w-full">
 
       {/* Top Navigation */}
 
