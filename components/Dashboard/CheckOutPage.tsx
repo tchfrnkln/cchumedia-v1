@@ -1,7 +1,8 @@
-// components/CheckoutPage.tsx  (or Dashboard/CheckOut.tsx)
+// components/Dashboard/CheckOut.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ChevronDown,
   Mail,
@@ -11,105 +12,172 @@ import {
   ShoppingCart,
   User,
 } from 'lucide-react';
+import { PaystackButton } from 'react-paystack';
 import { useCartStore } from '@/store/cartStore';
 import { useCheckoutStore } from '@/store/checkoutStore';
-// import { useCartStore } from '@/stores/cartStore';
-// import { useCheckoutStore } from '@/stores/checkoutStore';
+import { supabase } from '@/lib/supabase/client'; // your initialized client
 
 const nigerianStates = [
-  'Abia',
-  'Adamawa',
-  'Akwa Ibom',
-  'Anambra',
-  'Bauchi',
-  'Bayelsa',
-  'Benue',
-  'Borno',
-  'Cross River',
-  'Delta',
-  'Ebonyi',
-  'Edo',
-  'Ekiti',
-  'Enugu',
-  'Gombe',
-  'Imo',
-  'Jigawa',
-  'Kaduna',
-  'Kano',
-  'Katsina',
-  'Kebbi',
-  'Kogi',
-  'Kwara',
-  'Lagos',
-  'Nasarawa',
-  'Niger',
-  'Ogun',
-  'Ondo',
-  'Osun',
-  'Oyo',
-  'Plateau',
-  'Rivers',
-  'Sokoto',
-  'Taraba',
-  'Yobe',
-  'Zamfara',
-  'Federal Capital Territory (FCT)',
+  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
+  'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'Gombe', 'Imo', 'Jigawa',
+  'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger',
+  'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe',
+  'Zamfara', 'Federal Capital Territory (FCT)',
 ];
 
+interface PaystackSuccessResponse {
+  reference: string;
+}
+
 export default function CheckoutPage() {
-  const [isModalOpen, setIsModalOpen] = useState(true); // ← modal starts open
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const cartItems = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clearCart);
 
   const subtotal = useCartStore((state) =>
     state.items.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0)
   );
 
   const tax = Math.round(subtotal * 0.08);
-
   const { deliveryFee } = useCheckoutStore();
-
   const total = subtotal + tax + deliveryFee;
 
   const checkout = useCheckoutStore();
 
-  // Update delivery fee when shipping method or state changes
   useEffect(() => {
     checkout.updateDeliveryFee();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ checkout.shippingMethod, checkout.state]);
+  }, [checkout.shippingMethod, checkout.state]);
 
-  const handleCheckout = () => {
-    const checkoutData = {
-      personal: {
-        firstName: checkout.firstName,
-        lastName: checkout.lastName,
-        email: checkout.email,
-        phone: checkout.phone,
-      },
-      shipping: {
-        method: checkout.shippingMethod,
-        address1: checkout.address1,
-        address2: checkout.address2,
-        state: checkout.state,
-        deliveryFee: checkout.deliveryFee,
-      },
-      order: {
-        items: cartItems,
-        subtotal,
-        tax,
-        deliveryFee,
-        total,
-      },
-      timestamp: new Date().toISOString(),
-    };
+  const reference = useMemo(() => {
+    return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  }, []);
 
-    console.log('CHECKOUT SUBMISSION:', JSON.stringify(checkoutData, null, 2));
+  const isFormValid =
+    checkout.firstName.trim() !== '' &&
+    checkout.lastName.trim() !== '' &&
+    checkout.email.trim() !== '' &&
+    checkout.phone.trim() !== '' &&
+    (checkout.shippingMethod === 'pickup' ||
+      (checkout.address1.trim() !== '' && checkout.state.trim() !== ''));
 
-    // You can later replace this with:
-    // - API call to create order
-    // - toast notification
-    // - redirect to payment or success page
+  const handlePaymentSuccess = async (paystackReference: string) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Please sign in to complete your order");
+      }
+
+      // 1. Insert main order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          paystack_reference: paystackReference,
+          first_name: checkout.firstName.trim(),
+          last_name: checkout.lastName.trim(),
+          email: checkout.email.trim(),
+          phone: checkout.phone.trim(),
+          shipping_method: checkout.shippingMethod,
+          address_line1: checkout.address1.trim(),
+          address_line2: checkout.address2.trim(),
+          state: checkout.state.trim(),
+          subtotal,
+          tax_amount: tax,
+          delivery_fee: deliveryFee,
+          total_amount: total,
+          status: 'paid',
+        })
+        .select('id')
+        .single();
+
+      if (orderError || !order?.id) {
+        throw orderError || new Error("Failed to create order");
+      }
+
+      // 2. Insert order items
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        name: item.name || 'Unnamed product',
+        price: item.price ?? 0,
+        quantity: item.quantity,
+        specs: item.specs || null,
+        design: item.design || null,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        throw itemsError;
+      }
+
+      // Success
+      alert(`Payment successful!\nOrder created (ID: ${order.id})`);
+
+      clearCart();
+      setIsModalOpen(false);
+
+      // Redirect to dashboard
+      router.push('/dashboard');
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Order creation failed:", err);
+      alert(
+        `Payment was successful, but we couldn't save your order.\n` +
+        `Please contact support with reference: ${paystackReference}\n` +
+        `Error: ${err.message || 'Unknown error'}`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const paystackConfig = {
+    reference,
+    email: checkout.email.trim(),
+    amount: Math.round(total * 100),
+    publicKey: 'pk_test_a361ebecc9edf1b3af278b0b42e9b037a668c872',
+    currency: 'NGN',
+    firstname: checkout.firstName.trim(),
+    lastname: checkout.lastName.trim(),
+    phone: checkout.phone.trim(),
+    metadata: {
+      custom_fields: [
+        {
+          display_name: 'Shipping Method',
+          variable_name: 'shipping_method',
+          value: checkout.shippingMethod,
+        },
+        {
+          display_name: 'Delivery State',
+          variable_name: 'delivery_state',
+          value: checkout.state,
+        },
+      ],
+    },
+  };
+
+  const paystackProps = {
+    ...paystackConfig,
+    text: isSubmitting ? 'Processing...' : 'Confirm & Pay Now',
+    onSuccess: (response: PaystackSuccessResponse) => handlePaymentSuccess(response.reference),
+    onClose: () => {
+      if (!isSubmitting) {
+        alert('Payment window was closed. You can try again.');
+      }
+    },
+    disabled: !isFormValid || cartItems.length === 0 || isSubmitting,
+    className: `btn ${isFormValid && !isSubmitting ? 'btn-primary' : 'btn-disabled'} w-full`,
   };
 
   return (
@@ -147,20 +215,20 @@ export default function CheckoutPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₦{(subtotal).toLocaleString()}</span>
+                  <span>₦{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>VAT (8%)</span>
-                  <span>₦{(tax).toLocaleString()}</span>
+                  <span>₦{tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Fee to {checkout.state}</span>
-                  <span>₦{(deliveryFee).toLocaleString()}</span>
+                  <span>₦{deliveryFee.toLocaleString()}</span>
                 </div>
                 <div className="divider my-3"></div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>₦{(total).toLocaleString()}</span>
+                  <span>₦{total.toLocaleString()}</span>
                 </div>
               </div>
             </>
@@ -189,9 +257,7 @@ export default function CheckoutPage() {
             {/* Name fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="label">
-                  <span className="label-text">First Name</span>
-                </label>
+                <label className="label"><span className="label-text">First Name</span></label>
                 <input
                   type="text"
                   className="input input-bordered w-full"
@@ -200,9 +266,7 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="label">
-                  <span className="label-text">Last Name</span>
-                </label>
+                <label className="label"><span className="label-text">Last Name</span></label>
                 <input
                   type="text"
                   className="input input-bordered w-full"
@@ -212,7 +276,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Email & Phone */}
             <div>
               <label className="label flex items-center gap-2">
                 <Mail size={16} /> <span>Email</span>
@@ -237,7 +300,6 @@ export default function CheckoutPage() {
               />
             </div>
 
-            {/* Shipping method */}
             <div>
               <label className="label">Delivery Option</label>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -271,7 +333,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Address – shown only for home delivery */}
             {checkout.shippingMethod === 'home' && (
               <>
                 <div>
@@ -322,12 +383,15 @@ export default function CheckoutPage() {
           </div>
 
           <div className="modal-action mt-8">
-            <button className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>
+            <button
+              className="btn btn-ghost"
+              onClick={() => setIsModalOpen(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button className="btn btn-primary" onClick={handleCheckout}>
-              Confirm & Place Order
-            </button>
+
+            <PaystackButton {...paystackProps} />
           </div>
         </div>
       </div>
