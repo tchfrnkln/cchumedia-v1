@@ -46,10 +46,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="w-full md:flex items-center justify-center bg-base-100 md:bg-base-200 py-24">
+    <div className="w-full md:flex items-center justify-center bg-base-100">
       <div className="w-full md:w-3/5 bg-base-100 md:shadow-xl rounded-lg p-4 flex justify-center items-center">
         <div className="w-full px-8 md:p-4 md:px-24">
-          <h1 className="card-title text-2xl justify-center py-4">Sign up</h1>
+          <h1 className="card-title text-2xl justify-center md:justify-start py-4">Sign up</h1>
 
           <form onSubmit={handleSignup} className="space-y-4">
             {/* Full Name */}

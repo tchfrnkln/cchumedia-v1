@@ -20,6 +20,7 @@ export interface CheckoutState {
   updateDeliveryFee: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const NIGERIAN_STATES = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
   'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'Gombe', 'Imo', 'Jigawa',

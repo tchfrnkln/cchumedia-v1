@@ -5,7 +5,8 @@ import Link from 'next/link'
 
 const Hero = () => {
 
-    const whatapp = "https://wa.me/2348052929523?text=Hello%20C-CHU%20Media%2C%20My%20name%20is"
+    // const whatapp = "https://wa.me/2348052929523?text=Hello%20C-CHU%20Media%2C%20My%20name%20is"
+    const signup = "/auth/new"
 
     // const services = [
     //     "Photography & Cinematography",
@@ -38,7 +39,7 @@ const Hero = () => {
                 <p className="py-6 px-2">
                     We bring your ideas to life with precision and creativity, ensuring your brand shines brighter in a crowded market.
                 </p>
-                <Link href={whatapp}  className="btn btn-primary mt-12">Discover More</Link>
+                <Link href={signup}  className="btn btn-primary mt-12">Discover More</Link>
                 <p className='font-bold py-2'>Expect results that exceed your expectations.</p>
             </div>
             {/* Carosals */}
