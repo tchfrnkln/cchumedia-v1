@@ -104,10 +104,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer" 
-                        onClick={() =>
-                          router.push(`/products/${product.id}`)
-                        }>
+              <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer">
                 <figure>
                   {product.image_url ? (
                     <Image
