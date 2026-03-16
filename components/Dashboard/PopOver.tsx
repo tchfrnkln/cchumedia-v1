@@ -43,7 +43,10 @@ export default function DesignPopover({ id }: Props) {
     setLogo,
     noLogo,
     toggleNoLogo,
-    uploadLogoFile
+    uploadLogoFile,
+
+    popOverProcessing,
+    setPopOverProcessing
   } = useDesignPopoverStore();
 
   const { addToCart } = useCartStore();
@@ -65,6 +68,7 @@ export default function DesignPopover({ id }: Props) {
   const handleBack = () => setDesignType(null);
 
   const handleContinue = async () => {
+    setPopOverProcessing(true);
     // Validation
     if (designType === 'have-design' && !designFile) {
       toast.error('Please upload your design file');
@@ -114,6 +118,7 @@ export default function DesignPopover({ id }: Props) {
     clearQuantity(id);
     clearSpecs(id);
     handleClose();
+    setPopOverProcessing(false)
   };
 
   return (
@@ -189,8 +194,8 @@ export default function DesignPopover({ id }: Props) {
                 </div>
               )}
 
-              <button className="btn btn-primary w-full" onClick={handleContinue} disabled={!designFile}>
-                Continue
+              <button className="btn btn-primary w-full" onClick={handleContinue} disabled={!designFile || popOverProcessing}>
+                {popOverProcessing ? 'Adding to Cart...' : 'Continue'}
               </button>
             </div>
           )}
@@ -255,10 +260,10 @@ export default function DesignPopover({ id }: Props) {
               disabled={
                     !businessName.trim() ||
                     !description.trim() ||
-                    (!noLogo && !logo)
+                    (!noLogo && !logo) || popOverProcessing
                 }
               >
-                Continue
+                {popOverProcessing ? 'Adding to Cart...' : 'Continue'}
               </button>
             </div>
           )}

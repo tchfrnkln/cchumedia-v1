@@ -36,6 +36,9 @@ interface DesignPopoverState {
   setLogo: (file: File | null) => void;
   toggleNoLogo: () => void;
   uploadLogoFile: (file: File) => Promise<void>;
+
+  popOverProcessing: boolean;
+  setPopOverProcessing: (processing: boolean) => void;
 }
 
 export const useDesignPopoverStore = create<DesignPopoverState>((set) => ({
@@ -117,4 +120,6 @@ export const useDesignPopoverStore = create<DesignPopoverState>((set) => ({
       toast.error(`Logo upload failed: ${ (err as Error).message }`);
     }
   },
+  popOverProcessing: false,
+  setPopOverProcessing: (processing) => set({ popOverProcessing: processing }),
 }));
