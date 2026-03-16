@@ -13,20 +13,27 @@ export default function Breadcrumbs() {
 
   const segments = pathname.split('/').filter(Boolean);
 
-  // Optional: Custom label mapping for better readability
-  // Extend this object for dynamic/[slug] routes, dashboard sections, etc.
+  // Custom label mapping (what the user sees)
   const labelMap: Record<string, string> = {
     dashboard: 'Dashboard',
     checkout: 'Checkout',
     orders: 'My Orders',
     profile: 'Profile',
-    products: 'Products',
-    // Example dynamic route handling (you can make this more advanced)
-    '[id]': 'Item Details', // fallback - replace with real title fetch if needed
+    products: 'Products',           // ← displayed text stays "Products"
+    // Add more as needed
+    // '[id]': 'Item Details',      // example for dynamic segments
+  };
+
+  // Custom link override mapping (where it actually goes)
+  // Only needed for segments where href should differ from the path
+  const linkOverrideMap: Record<string, string> = {
+    products: '/dashboard',         // ← key change: /products → /dashboard
+    // Add more overrides if you have other special cases, e.g.:
+    // 'settings': '/account/settings',
   };
 
   const getLabel = (segment: string) => {
-    // Clean up slugs: kebab-case → Title Case
+    // Clean up slugs: kebab-case → Title Case (fallback)
     const cleaned = segment
       .replace(/-/g, ' ')
       .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -42,12 +49,17 @@ export default function Breadcrumbs() {
         </li>
 
         {segments.map((segment, index) => {
-          const href = '/' + segments.slice(0, index + 1).join('/');
+          // Build the default href from path segments
+          const defaultHref = '/' + segments.slice(0, index + 1).join('/');
+
+          // Use override if defined for this segment, otherwise use default
+          const href = linkOverrideMap[segment] ?? defaultHref;
+
           const label = getLabel(segment);
           const isLast = index === segments.length - 1;
 
           return (
-            <li key={href}>
+            <li key={defaultHref}>  {/* key on original path to avoid dupes */}
               {isLast ? (
                 <span className="text-base-content/70">{label}</span>
               ) : (
