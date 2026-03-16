@@ -102,9 +102,12 @@ export default function Dashboard() {
         ) : filteredProducts.length === 0 ? (
           <p className="text-center text-lg">No products found.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="card bg-base-100 shadow-xl">
+              <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer" 
+                        onClick={() =>
+                          router.push(`/products/${product.id}`)
+                        }>
                 <figure>
                   {product.image_url ? (
                     <Image
@@ -124,7 +127,7 @@ export default function Dashboard() {
                 <div className="card-body">
                   <h2 className="card-title">{product.name}</h2>
 
-                  <p>{product.description || 'No description'}</p>
+                  <p className='line-clamp-3'>{product.description || 'No description'}</p>
 
                   <div className="card-actions justify-end">
 

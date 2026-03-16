@@ -102,7 +102,7 @@ const CartDrawer = () => {
                 Clear Cart
               </button>
 
-              <Link href="/checkout">
+              <Link href="/checkout" onClick={closeCartDrawer}>
                 <button className="btn btn-primary w-full max-w-xs">
                   Proceed to Checkout
                 </button>
