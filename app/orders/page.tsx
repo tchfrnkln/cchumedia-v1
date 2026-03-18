@@ -1,7 +1,7 @@
 'use client';
 
 import LogoutButton from '@/components/Auth/LogOut';
-import OrdersPage from '@/components/Dashboard/OrdersPage';
+import OrdersPage from '@/components/Dashboard/Orders/OrdersPage';
 import Footer from '@/components/Home/Footer';
 import Socials from '@/components/Home/Header/Socials';
 

@@ -1,5 +1,5 @@
 import LogoutButton from '@/components/Auth/LogOut'
-import ProductDetailPage from '@/components/Dashboard/ProductDetail'
+import ProductDetailPage from '@/components/Dashboard/Products/ProductDetail'
 import Footer from '@/components/Home/Footer'
 import Socials from '@/components/Home/Header/Socials'
 import React from 'react'

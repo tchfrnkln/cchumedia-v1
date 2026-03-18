@@ -1,7 +1,7 @@
 'use client';
 
 import LogoutButton from '@/components/Auth/LogOut';
-import CheckoutPage from '@/components/Dashboard/Checkout/CheckOutPage';
+import AdminOrdersPage from '@/components/Dashboard/Admin/AdminStatus';
 import Footer from '@/components/Home/Footer';
 import Socials from '@/components/Home/Header/Socials';
 
@@ -12,7 +12,7 @@ export default function DashboadHome() {
       <div className='w-full fixed top-0 left-0 bg-[#DCD8EF] p-4 z-10'>
         <Socials withMail/>
       </div>
-      <CheckoutPage/>
+      <AdminOrdersPage/>
       <div className="fixed bottom-4 right-4">
           <LogoutButton/>
       </div>

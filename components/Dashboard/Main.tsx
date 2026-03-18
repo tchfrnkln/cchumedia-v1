@@ -8,8 +8,8 @@ import { useUserRoleStore } from '@/store/authRole';
 import { useDashboardStore } from '@/store/dashboardStore';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import CartDrawer, { Cart } from './CartDrawer';
-import AddProducts, { EditProducts } from './AlterProducts';
+import CartDrawer, { Cart } from './Products/CartDrawer';
+import AddProducts, { EditProducts } from './Products/AlterProducts';
 
 export default function Dashboard() {
   const router = useRouter();
