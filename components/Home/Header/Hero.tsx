@@ -15,10 +15,10 @@ const Hero = () => {
     //     "Branding & Identity",
     //     "Digital Marketing",
     //     "Social Media Management"
-    // ]
+    // ] bg-[#9B96C8]
 
   return (
-    <div className="max-w-screen w-full hero bg-[#9B96C8] min-h-screen text-[#2A2840]">
+    <div className="max-w-screen w-full hero bg-[#DCD8EF] min-h-screen text-[#2A2840]">
         <div className="hero-content flex-col lg:flex-row md:px-24">
             <div className='md:px-24 pt-15 md:pt-0'>
                 <div className='w-16 h-16 bg-[#DCD8EF] justify-center items-center flex rounded-full mb-4'>

@@ -12,7 +12,11 @@ export default function AutoCarousel() {
     { src: "/images/Table.jpg", alt: "Table showcase" },
     { src: "/images/Shirts.jpg", alt: "Shirts showcase" },
     { src: "/images/Signage.jpg", alt: "Signage showcase" },
-    // Add more images here if needed
+    { src: "/images/banner.jpeg", alt: "Banner showcase" },
+    { src: "/images/mug.jpeg", alt: "Mug showcase" },
+    { src: "/images/paper.jpeg", alt: "paper showcase" },
+    { src: "/images/shirts2.jpeg", alt: "Shirt showcase" },
+    { src: "/images/sticker.jpeg", alt: "sticker showcase" },
   ];
 
   // Auto-scroll logic (every 4 seconds, pause on hover/touch)
@@ -48,9 +52,10 @@ export default function AutoCarousel() {
       {/* Phone mockup wrapper */}
       {/* <div className="mockup-phone border-[#58547A] relative"> */}
       {/* <div className="mockup-phone border-[#D8261C] relative"> */}
-      <div className="mockup-phone border-[#DCD8EF] relative">
+      {/* <div className="mockup-phone border-[#DCD8EF] relative"> */}
+      <div className="mockup-phone border-[#9B96C8] relative">
         {/* Camera notch */}
-        <div className="mockup-phone-camera"></div>
+        <div className="mockup-phone-camera bg-[#9B96C8]"></div>
 
         {/* The screen/display area – carousel goes here */}
         <div className="mockup-phone-display w-54">
@@ -70,7 +75,7 @@ export default function AutoCarousel() {
                   alt={img.alt}
                   width={300}   // Typical phone width (adjust if needed)
                   height={667}  // Typical phone height (adjust for aspect ratio)
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   priority={idx === 0} // Optional: load first image faster
                 />
               </div>

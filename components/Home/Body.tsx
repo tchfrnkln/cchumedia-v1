@@ -11,16 +11,16 @@ const Body = () => {
     ] 
     
     const competitivePricing = [
-        {src:"/images/Table.jpg", alt:"cchu media competitive pricing", price:"5k", name:"Banner", description:"Large/Small Scale banner printings"},
-        {src:"/images/Shirts.jpg", alt:"cchu media competitive pricing", price:"3k", name:"Papers", description:"Catalogues, Flyers and all Papers Sizes"},
-        {src:"/images/Signage.jpg", alt:"cchu media competitive pricing", price:"4k", name:"SAV", description:"Stickers (SELF-Adhesive Vinyl)"},
+        {src:"/images/banner.jpeg", alt:"cchu media competitive pricing", price:"5k", name:"Banner", description:"Large/Small Scale banner printings"},
+        {src:"/images/paper.jpeg", alt:"cchu media competitive pricing", price:"3k", name:"Papers", description:"Catalogues, Flyers and all Papers Sizes"},
+        {src:"/images/sticker.jpeg", alt:"cchu media competitive pricing", price:"4k", name:"SAV", description:"Stickers (SELF-Adhesive Vinyl)"},
     ] 
 
     const expertise = [
         {src:"/images/Table.jpg", alt:"World-Class Expertise", name:"Printing & Publication", description:"Vibrant business cards, banners, posters, custom nylons, stickers, large-format prints, plus professional book production—editing, design, and premium printing to bring your story or brand to life."},
         {src:"/images/Shirts.jpg", alt:"World-Class Expertise", name:"Graphic Design & Videography", description:"Eye-catching logos, marketing visuals, digital graphics, and professional video production—events, promos, brand stories, corporate videos—with expert editing and motion graphics."},
         {src:"/images/Shirts.jpg", alt:"World-Class Expertise", name:"Photography", description:"High-impact product, portrait, event, and commercial shots—beautifully lit, composed, and edited to tell your story with clarity and style."},
-        {src:"/images/Table.jpg", alt:"World-Class Expertise", name:"Branding", description:"Strong, cohesive identities: brand stories, visual systems, custom elements (acrylic signs, fabric branding, labels, ID cards, backdrops), and integrated print/digital/video assets that make you stand out."},
+        {src:"/images/shirts2.jpeg", alt:"World-Class Expertise", name:"Branding", description:"Strong, cohesive identities: brand stories, visual systems, custom elements (acrylic signs, fabric branding, labels, ID cards, backdrops), and integrated print/digital/video assets that make you stand out."},
     ] 
 
   return (
