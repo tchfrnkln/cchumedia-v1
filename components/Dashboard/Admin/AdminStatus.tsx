@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState, Fragment } from 'react';
-// import { useAdminOrdersStore } from '@/store/adminOrdersStore';
-// import { OrderStatus } from '@/types/order';
 import {
   Package,
   RefreshCw,
@@ -12,9 +10,11 @@ import {
   FileText,
   Image as ImageIcon,
 } from 'lucide-react';
-import { OrderStatus } from '@/store/ordersStore';
+import { Order, OrderStatus } from '@/store/ordersStore';
 import { useAdminOrdersStore } from '@/store/adminOrders';
 import { DesignDetails } from '@/store/cartStore';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /* ---------------- STATUS ---------------- */
 
@@ -127,7 +127,92 @@ export default function AdminOrdersPage() {
     return <span className="opacity-50">—</span>;
   };
 
-  /* ---------------- UI ---------------- */
+
+  const generateReceiptPDF = (order: Order) => {
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(20);
+    doc.text('C-Chu Media', 105, 20, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.text('Birthing your Imagination', 105, 27, { align: 'center' });
+
+    // Logo placeholder
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    // doc.text('[ Logo goes here ]', 105, 35, { align: 'center' });
+
+    doc.line(20, 40, 190, 40);
+
+    // Order info
+    doc.setFontSize(12);
+    doc.text(`Receipt / Order #${order.id}`, 20, 55);
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString()}`, 20, 63);
+
+    // Customer
+    doc.text('Customer:', 20, 75);
+    doc.setFontSize(10);
+    doc.text(`${order.first_name} ${order.last_name}`, 50, 75);
+    doc.text(`${order.email}`, 50, 81);
+    doc.text(`${order.phone || '—'}`, 50, 87);
+
+    // Address
+    doc.text('Delivery Address:', 110, 75);
+    doc.text(`${order.address_line1 || '—'}`, 140, 75);
+    if (order.address_line2) doc.text(`${order.address_line2}`, 140, 81);
+    doc.text(`${order.state || '—'}`, 140, 87);
+
+    // Items table
+    const tableData = order.items?.map((item) => [
+      item.name || '—',
+      `NGN${Number(item.price || 0).toLocaleString()}`,
+      item.quantity || 0,
+      `NGN${(Number(item.price || 0) * (item.quantity || 0)).toLocaleString()}`,
+    ]) || [];
+
+    autoTable(doc, {
+      startY: 100,
+      head: [['Product', 'Price', 'Qty', 'Total']],
+      body: tableData,
+      theme: 'striped',
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [66, 139, 202] },
+      margin: { left: 20, right: 20 },
+    });
+
+    // Totals
+    const finalY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+
+    doc.setFontSize(10);
+    doc.text('Subtotal:', 140, finalY);
+    doc.text(`NGN${Number(order.subtotal || 0).toLocaleString()}`, 170, finalY);
+
+    doc.text('Tax:', 140, finalY + 7);
+    doc.text(`NGN${Number(order.tax_amount || 0).toLocaleString()}`, 170, finalY + 7);
+
+    doc.text('Delivery:', 140, finalY + 14);
+    doc.text(`NGN${Number(order.delivery_fee || 0).toLocaleString()}`, 170, finalY + 14);
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(140, finalY + 18, 190, finalY + 18);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Grand Total:', 140, finalY + 26);
+    doc.text(`NGN${Number(order.total_amount || 0).toLocaleString()}`, 170, finalY + 26);
+
+    // Footer
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text('Thank you for choosing C-Chu Media!', 105, finalY + 45, { align: 'center' });
+    doc.text('www.cchumedia.com • support@cchumedia.com', 105, finalY + 52, { align: 'center' });
+
+    // Download
+    doc.save(`C-Chu_Media_Receipt_${order.id}.pdf`);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -378,6 +463,17 @@ export default function AdminOrdersPage() {
                                 ₦{order.total_amount}
                               </p>
                             </div>
+                          </div>
+
+                          {/* ────────────── NEW BUTTON ────────────── */}
+                          <div className="flex justify-end pt-4">
+                            <button
+                              className="btn btn-primary btn-sm gap-2"
+                              onClick={() => generateReceiptPDF(order)}
+                            >
+                              <FileText size={16} />
+                              Download Receipt (PDF)
+                            </button>
                           </div>
 
                         </div>
