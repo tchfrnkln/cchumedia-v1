@@ -50,7 +50,7 @@ export default function DesignPopover({ id }: Props) {
   } = useDesignPopoverStore();
 
   const { addToCart } = useCartStore();
-  const { clearQuantity, getAllSpecs, clearSpecs, getQuantity } = useProductDetailStore();
+  const { clearQuantity, getAllSpecs, clearSpecs, getQuantity, getUnitPrice } = useProductDetailStore();
 
   const product = products.find((p) => p.id === id);
   if (!product) return null;
@@ -104,10 +104,12 @@ export default function DesignPopover({ id }: Props) {
 
     const specs = getAllSpecs(id);
 
+    const finalUnitPrice = getUnitPrice(id, product);
+
     addToCart(
       product.id,
       product.name,
-      product.price,
+      finalUnitPrice,
       quantity,
       specs,
       designDetails

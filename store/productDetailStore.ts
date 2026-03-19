@@ -4,8 +4,8 @@ import { create } from 'zustand';
 
 interface ProductDetailState {
   selectedQuantities: Record<string, number>;
-  selectedSpecs: Record<string, Record<string, string>>; // productId -> specs
-  defaultSpecs: Record<string, Record<string, string>>; // productId -> default specs
+  selectedSpecs: Record<string, Record<string, string>>; // productId → specKey → value
+  defaultSpecs: Record<string, Record<string, string>>;
 
   setQuantity: (productId: string, qty: number) => void;
   getQuantity: (productId: string, fallback: number) => number;
@@ -16,7 +16,24 @@ interface ProductDetailState {
   getAllSpecs: (productId: string) => Record<string, string>;
   clearSpecs: (productId: string) => void;
   setDefaultSpecs: (productId: string, specs: Record<string, string>) => void;
+
+  // New: price calculation moved here — called on demand
+  getUnitPrice: (
+    productId: string,
+    product: { price: number; specs?: Record<string, string[]> } | null
+  ) => number;
+
+  getTotalPrice: (
+    productId: string,
+    product: { price: number; specs?: Record<string, string[]> } | null,
+    quantityFallback: number
+  ) => number;
 }
+
+const extractPercentage = (value: string) => {
+  const match = value.match(/([+-]\d+)%/);
+  return match ? Number(match[1]) : 0;
+};
 
 export const useProductDetailStore = create<ProductDetailState>((set, get) => ({
   selectedQuantities: {},
@@ -65,4 +82,29 @@ export const useProductDetailStore = create<ProductDetailState>((set, get) => ({
     set((s) => ({
       defaultSpecs: { ...s.defaultSpecs, [productId]: specs },
     })),
+
+  // ────────────────────────────────────────────────
+  // Price calculation — pure, called when rendering
+  // ────────────────────────────────────────────────
+  getUnitPrice: (productId, product) => {
+    if (!product) return 0;
+
+    const basePrice = product.price;
+    let totalPercentage = 0;
+
+    if (product.specs) {
+      Object.entries(product.specs).forEach(([specKey, options]) => {
+        const selected = get().getSpec(productId, specKey, options[0]);
+        totalPercentage += extractPercentage(selected);
+      });
+    }
+
+    return basePrice * (1 + totalPercentage / 100);
+  },
+
+  getTotalPrice: (productId, product, quantityFallback) => {
+    const qty = get().getQuantity(productId, quantityFallback);
+    const unit = get().getUnitPrice(productId, product);
+    return unit * qty;
+  },
 }));
