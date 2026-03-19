@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ListOrdered, UserRound } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
 import { useUserRoleStore } from '@/store/authRole';
@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import CartDrawer, { Cart } from './Products/CartDrawer';
 import AddProducts, { EditProducts } from './Products/AlterProducts';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function Dashboard() {
   );
 
   const isAdminOrStaff = role === 'admin' || role === 'staff';
+  const isAdmin = role === 'admin';
 
   if (!user) return null;
 
@@ -71,6 +73,21 @@ export default function Dashboard() {
                 Add Product
               </button>
             )}
+            
+            {isAdmin ? (
+              <Link href="/admin"
+                className="btn btn-secondary"
+              >
+                <ListOrdered size={20} />
+                Orders
+              </Link>
+            ):
+            <Link href="/profile"
+                className="btn btn-secondary"
+              >
+                <UserRound size={20} />
+                Profile
+              </Link>}
           </div>
         </div>
 
