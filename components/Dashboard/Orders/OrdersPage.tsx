@@ -163,7 +163,7 @@ export default function OrdersPage() {
                       <span>₦{order.total_amount.toLocaleString()}</span>
                     </div>
                     <div className="text-xs opacity-60 mt-1">
-                      {order.paystack_reference === "bank_transfer"
+                      {order.paystack_reference === "Bank Transfer"
                         ? "Ref: Bank Transfer"
                         : `Paystack Ref: ${order.paystack_reference}`}
                     </div>
