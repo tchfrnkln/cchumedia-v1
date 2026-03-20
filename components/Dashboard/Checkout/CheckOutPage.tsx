@@ -10,18 +10,22 @@ import {
   Package,
   Phone,
   ShoppingCart,
-  User
+  User,
+  CreditCard,
+  Banknote,
+  X,
+  Check,
 } from 'lucide-react';
-// import { PaystackButton } from 'react-paystack';
 import { useCartStore } from '@/store/cartStore';
 import { useCheckoutStore } from '@/store/checkoutStore';
 import { supabase } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 
-// ── Dynamically import PaystackButton — never evaluated on server ──
+// Dynamic Paystack (unchanged)
 const PaystackButton = dynamic(
-  () => import('react-paystack').then(mod => mod.PaystackButton),
-  { ssr: false }   // ← critical: disables server-side rendering/import of this component
+  () => import('react-paystack').then((mod) => mod.PaystackButton),
+  { ssr: false }
 );
 
 const nigerianStates = [
@@ -41,6 +45,11 @@ export default function CheckoutPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // New states for bank transfer flow
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
   const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
 
@@ -48,22 +57,13 @@ export default function CheckoutPage() {
     state.items.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0)
   );
 
-  // ── UPDATED: Custom design fee = 5000 per distinct item that needs design-for-me ──
   const CUSTOM_DESIGN_FEE = 5000;
 
   const customDesignFee = useMemo(() => {
-    // Count unique cart items (by productId + design fingerprint) that require custom design
     const designItems = cartItems.filter((item) => item.design?.type === 'design-for-me');
-
-    // If your cart allows duplicate productId with different designs, use a better key
-    // For most stores → productId + JSON.stringify(design) is safer
     const uniqueDesignKeys = new Set(
-      designItems.map((item) => {
-        // If design can differ per line item → use both product + design content
-        return `${item.productId}-${JSON.stringify(item.design ?? {})}`;
-      })
+      designItems.map((item) => `${item.productId}-${JSON.stringify(item.design ?? {})}`)
     );
-
     return uniqueDesignKeys.size * CUSTOM_DESIGN_FEE;
   }, [cartItems]);
 
@@ -75,7 +75,6 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     checkout.updateDeliveryFee();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkout.shippingMethod, checkout.state]);
 
   const reference = useMemo(() => {
@@ -90,17 +89,15 @@ export default function CheckoutPage() {
     (checkout.shippingMethod === 'pickup' ||
       (checkout.address1.trim() !== '' && checkout.state.trim() !== ''));
 
+  // ── Paystack success (unchanged logic, status = 'paid') ──
   const handlePaymentSuccess = async (paystackReference: string) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("Please sign in to complete your order");
-      }
+      if (!user) throw new Error("Please sign in to complete your order");
 
-      // 1. Insert main order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -117,18 +114,15 @@ export default function CheckoutPage() {
           subtotal,
           tax_amount: tax,
           delivery_fee: deliveryFee,
-          custom_design_fee: customDesignFee,     // now correct amount
+          custom_design_fee: customDesignFee,
           total_amount: total,
           status: 'paid',
         })
         .select('id')
         .single();
 
-      if (orderError || !order?.id) {
-        throw orderError || new Error("Failed to create order");
-      }
+      if (orderError || !order?.id) throw orderError || new Error("Failed to create order");
 
-      // 2. Insert order items (unchanged)
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_id: item.productId,
@@ -139,26 +133,18 @@ export default function CheckoutPage() {
         design: item.design || null,
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) throw itemsError;
 
-      if (itemsError) {
-        throw itemsError;
-      }
-
-      alert(`Payment successful!\nOrder created (ID: ${order.id})`);
-
+      toast.success(`Payment successful! Order #${order.id} created.`);
       clearCart();
       setIsModalOpen(false);
-
       router.push('/orders');
-
     } catch (err: unknown) {
-      console.error("Order creation failed:", err);
-      alert(
-        `Payment was successful, but we couldn't save your order.\n` +
-        `Please contact support with reference: ${paystackReference}\n` +
+      console.error(err);
+      toast.error(
+        `Payment succeeded but order creation failed.\n` +
+        `Reference: ${paystackReference}\n` +
         `Error: ${ (err as Error).message || 'Unknown error' }`
       );
     } finally {
@@ -166,10 +152,97 @@ export default function CheckoutPage() {
     }
   };
 
+  // ── New: Handle bank transfer receipt upload & order creation ──
+  const handleBankTransferConfirm = async () => {
+    if (!receiptFile) {
+      toast.error("Please upload a payment receipt image");
+      return;
+    }
+
+    setUploadingReceipt(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Please sign in to place this order");
+
+      // 1. Upload receipt
+      const fileExt = receiptFile.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `receipts/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('payment_receipts')
+        .upload(filePath, receiptFile, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: receiptFile.type,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 2. Get public URL (optional — or use signed URL later)
+      const { data: urlData } = supabase.storage.from('payment_receipts').getPublicUrl(filePath);
+
+      // 3. Create order with status = 'pending'
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          paystack_reference: "Bank Transfer", // no paystack for transfer
+          payment_method: "bank_transfer",
+          receipt_url: urlData.publicUrl || null,
+          first_name: checkout.firstName.trim(),
+          last_name: checkout.lastName.trim(),
+          email: checkout.email.trim(),
+          phone: checkout.phone.trim(),
+          shipping_method: checkout.shippingMethod,
+          address_line1: checkout.address1.trim(),
+          address_line2: checkout.address2.trim(),
+          state: checkout.state.trim(),
+          subtotal,
+          tax_amount: tax,
+          delivery_fee: deliveryFee,
+          custom_design_fee: customDesignFee,
+          total_amount: total,
+          status: 'pending',           // ← important
+        })
+        .select('id')
+        .single();
+
+      if (orderError || !order?.id) throw orderError || new Error("Failed to create order");
+
+      // 4. Insert order items (same as before)
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        name: item.name || 'Unnamed product',
+        price: item.price ?? 0,
+        quantity: item.quantity,
+        specs: item.specs || null,
+        design: item.design || null,
+      }));
+
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) throw itemsError;
+
+      toast.success(`Order #${order.id} placed! Please wait for confirmation.`);
+      clearCart();
+      setShowBankModal(false);
+      setIsModalOpen(false);
+      setReceiptFile(null);
+      router.push('/orders');
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error(`Failed to place order: ${ (err as Error).message || 'Unknown error' }`);
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
+
   const paystackConfig = {
     reference,
     email: checkout.email.trim(),
-    amount: Math.round(total * 100),          // includes corrected customDesignFee
+    amount: Math.round(total * 100),
     publicKey: 'pk_test_a361ebecc9edf1b3af278b0b42e9b037a668c872',
     currency: 'NGN',
     firstname: checkout.firstName.trim(),
@@ -177,36 +250,26 @@ export default function CheckoutPage() {
     phone: checkout.phone.trim(),
     metadata: {
       custom_fields: [
-        {
-          display_name: 'Shipping Method',
-          variable_name: 'shipping_method',
-          value: checkout.shippingMethod,
-        },
-        {
-          display_name: 'Delivery State',
-          variable_name: 'delivery_state',
-          value: checkout.state,
-        },
+        { display_name: 'Shipping Method', variable_name: 'shipping_method', value: checkout.shippingMethod },
+        { display_name: 'Delivery State', variable_name: 'delivery_state', value: checkout.state },
       ],
     },
   };
 
   const paystackProps = {
     ...paystackConfig,
-    text: isSubmitting ? 'Processing...' : 'Confirm & Pay Now',
+    text: isSubmitting ? 'Processing...' : 'Paystack',
     onSuccess: (response: PaystackSuccessResponse) => handlePaymentSuccess(response.reference),
     onClose: () => {
-      if (!isSubmitting) {
-        alert('Payment window was closed. You can try again.');
-      }
+      if (!isSubmitting) toast('Payment window closed');
     },
     disabled: !isFormValid || cartItems.length === 0 || isSubmitting,
-    className: `btn ${isFormValid && !isSubmitting ? 'btn-primary' : 'btn-disabled'} w-full`,
+    className: `btn ${isFormValid && !isSubmitting ? 'btn-primary' : 'btn-disabled'} flex-1`,
   };
 
   return (
     <div className="min-h-screen p-6 flex flex-col items-center">
-      {/* Order Summary Card */}
+      {/* Order Summary Card — unchanged */}
       <div className="card bg-base-100 shadow-xl w-full max-w-2xl mb-8">
         <div className="card-body">
           <h2 className="card-title text-2xl flex items-center gap-3 mb-4">
@@ -214,9 +277,7 @@ export default function CheckoutPage() {
           </h2>
 
           {cartItems.length === 0 ? (
-            <div className="alert alert-info">
-              Your cart is empty. Add some products first.
-            </div>
+            <div className="alert alert-info">Your cart is empty. Add some products first.</div>
           ) : (
             <>
               <div className="space-y-3 mb-6">
@@ -281,22 +342,22 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      {/* Checkout Information Modal */}
+      {/* Checkout Modal */}
       <div className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         <div className="relative modal-box max-w-lg w-11/12">
           <div
-            onClick={() => setIsModalOpen(!isModalOpen)}
+            onClick={() => setIsModalOpen(false)}
             className="absolute right-4 top-4 btn btn-ghost p-4 rounded-full text-xs cursor-pointer"
           >
-            <Backpack size={16} /> Summary
+            <X size={16} /> Close
           </div>
 
           <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
             <User size={24} /> Checkout Information
           </h3>
 
+          {/* Form fields — unchanged */}
           <div className="space-y-5">
-            {/* Name fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="label"><span className="label-text">First Name</span></label>
@@ -424,16 +485,89 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          <div className="modal-action mt-8">
+          {/* Payment buttons */}
+          <div className="modal-action mt-8 flex flex-col sm:flex-row gap-4">
             <button
-              className="btn btn-ghost"
+              className="btn btn-ghost flex-1"
               onClick={() => setIsModalOpen(false)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || uploadingReceipt}
             >
               Cancel
             </button>
 
+            <button
+              className="btn btn-outline flex-1 gap-2"
+              onClick={() => setShowBankModal(true)}
+              disabled={!isFormValid || cartItems.length === 0 || isSubmitting}
+            >
+              <Banknote size={18} />
+              Transfer
+            </button>
+
             <PaystackButton {...paystackProps} />
+          </div>
+        </div>
+      </div>
+
+      {/* Bank Transfer Confirmation Modal */}
+      <div className={`modal ${showBankModal ? 'modal-open' : ''}`}>
+        <div className="modal-box max-w-md">
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <Banknote size={24} /> Bank Transfer Payment
+          </h3>
+
+          <div className="bg-base-200 p-4 rounded-lg mb-6">
+            <p className="font-medium mb-2">{`Please transfer ₦${total.toLocaleString()}  to:`}</p>
+            <p><strong>Account Number:</strong> 0130385926</p>
+            <p><strong>Account Name:</strong> C-Chu Media LTD.</p>
+            <p className="text-sm mt-3 text-warning">
+              Include your email or phone number in the narration for faster confirmation.
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <label className="label">Upload Payment Receipt (image / pdf)</label>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              className="file-input file-input-bordered w-full"
+              onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+              disabled={uploadingReceipt}
+            />
+            {receiptFile && (
+              <p className="text-xs mt-2 opacity-70">
+                Selected: {receiptFile.name} ({(receiptFile.size / 1024 / 1024).toFixed(2)} MB)
+              </p>
+            )}
+          </div>
+
+          <div className="modal-action">
+            <button
+              className="btn btn-ghost"
+              onClick={() => {
+                setShowBankModal(false);
+                setReceiptFile(null);
+              }}
+              disabled={uploadingReceipt}
+            >
+              <X size={16} /> Cancel
+            </button>
+
+            <button
+              className="btn btn-primary gap-2"
+              onClick={handleBankTransferConfirm}
+              disabled={!receiptFile || uploadingReceipt}
+            >
+              {uploadingReceipt ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span> Uploading...
+                </>
+              ) : (
+                <>
+                  <Check size={16} /> Continue & Place Order
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

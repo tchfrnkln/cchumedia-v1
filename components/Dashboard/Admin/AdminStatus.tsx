@@ -77,7 +77,7 @@ export default function AdminOrdersPage() {
     if (design.type === 'have-design') {
       return (
         <div className="space-y-2 text-xs">
-          <div className="badge badge-info">Have Design</div>
+          <div className="badge badge-info text-[8px]">Have Design</div>
 
           {design.designFile && (
             <a
@@ -95,7 +95,7 @@ export default function AdminOrdersPage() {
     if (design.type === 'design-for-me') {
       return (
         <div className="space-y-2 text-xs">
-          <div className="badge badge-warning">Design Request</div>
+          <div className="badge badge-warning text-[8px]">Design Request</div>
 
           <div>
             <strong>Business:</strong>{' '}
@@ -440,19 +440,19 @@ export default function AdminOrdersPage() {
                               <p className="font-semibold">
                                 Subtotal
                               </p>
-                              <p>₦{order.subtotal}</p>
+                              <p>₦{order.subtotal.toLocaleString()}</p>
                             </div>
 
                             <div>
                               <p className="font-semibold">Tax</p>
-                              <p>₦{order.tax_amount}</p>
+                              <p>₦{order.tax_amount.toLocaleString()}</p>
                             </div>
 
                             <div>
                               <p className="font-semibold">
                                 Delivery
                               </p>
-                              <p>₦{order.delivery_fee}</p>
+                              <p>₦{order.delivery_fee.toLocaleString()}</p>
                             </div>
 
                             <div>
@@ -460,13 +460,23 @@ export default function AdminOrdersPage() {
                                 Total
                               </p>
                               <p className="font-bold">
-                                ₦{order.total_amount}
+                                ₦{order.total_amount.toLocaleString()}
                               </p>
                             </div>
                           </div>
 
                           {/* ────────────── NEW BUTTON ────────────── */}
-                          <div className="flex justify-end pt-4">
+                          <div className={`
+                              flex pt-4
+                              ${order.receipt_url ? 'justify-between' : 'justify-end'}
+                            `}>
+                            {order.receipt_url && <button
+                              className="btn btn-neutral btn-sm gap-2"
+                              onClick={() => order.receipt_url && window.open(order.receipt_url, '_blank')}
+                            >
+                              <FileText size={16} />
+                              View Transfer Receipt
+                            </button>}
                             <button
                               className="btn btn-primary btn-sm gap-2"
                               onClick={() => generateReceiptPDF(order)}

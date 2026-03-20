@@ -45,6 +45,7 @@ export interface Order {
   created_at: string;           // Supabase auto column
   // You can add user_id, updated_at, etc. if needed
   items?: OrderItem[];          // we'll join or fetch separately
+  receipt_url?: string | null;
 }
 
 interface OrdersState {
@@ -93,7 +94,8 @@ export const useOrdersStore = create<OrdersState>()(
               custom_design_fee,
               total_amount,
               status,
-              created_at
+              created_at,
+              receipt_url
             `)
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
@@ -124,6 +126,7 @@ export const useOrdersStore = create<OrdersState>()(
                 deliveryFee: order.delivery_fee,
                 total: order.total_amount,
                 timestamp: order.created_at,
+                receipt_url: order.receipt_url,
               } as Order;
             })
           );
