@@ -39,6 +39,7 @@ export interface Order {
   subtotal: number;
   tax_amount: number;
   delivery_fee: number;
+  delivery_area: string | null;
   custom_design_fee?: number;   // optional – if you added this column
   total_amount: number;
   status: OrderStatus;
@@ -91,6 +92,7 @@ export const useOrdersStore = create<OrdersState>()(
               subtotal,
               tax_amount,
               delivery_fee,
+              delivery_area,
               custom_design_fee,
               total_amount,
               status,
@@ -124,6 +126,7 @@ export const useOrdersStore = create<OrdersState>()(
                 address2: order.address_line2 || '',
                 tax: order.tax_amount,
                 deliveryFee: order.delivery_fee,
+                deliveryArea: order.delivery_area,
                 total: order.total_amount,
                 timestamp: order.created_at,
                 receipt_url: order.receipt_url,

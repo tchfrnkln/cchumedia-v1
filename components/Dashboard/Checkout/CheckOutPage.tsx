@@ -22,7 +22,7 @@ import { supabase } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 
-// Dynamic Paystack (unchanged)
+// Dynamic Paystack
 const PaystackButton = dynamic(
   () => import('react-paystack').then((mod) => mod.PaystackButton),
   { ssr: false }
@@ -45,7 +45,6 @@ export default function CheckoutPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // New states for bank transfer flow
   const [showBankModal, setShowBankModal] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
@@ -75,7 +74,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     checkout.updateDeliveryFee();
-  }, [checkout.shippingMethod, checkout.state]);
+  }, [checkout.shippingMethod, checkout.deliveryArea, checkout.useDeliveryDiscount]);
 
   const reference = useMemo(() => {
     return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
@@ -87,9 +86,11 @@ export default function CheckoutPage() {
     checkout.email.trim() !== '' &&
     checkout.phone.trim() !== '' &&
     (checkout.shippingMethod === 'pickup' ||
-      (checkout.address1.trim() !== '' && checkout.state.trim() !== ''));
+      (checkout.address1.trim() !== '' &&
+       checkout.state.trim() !== '' &&
+       checkout.deliveryArea.trim() !== ''));
 
-  // ── Paystack success (unchanged logic, status = 'paid') ──
+  // Paystack success handler
   const handlePaymentSuccess = async (paystackReference: string) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
@@ -103,6 +104,7 @@ export default function CheckoutPage() {
         .insert({
           user_id: user.id,
           paystack_reference: paystackReference,
+          payment_method: 'paystack',
           first_name: checkout.firstName.trim(),
           last_name: checkout.lastName.trim(),
           email: checkout.email.trim(),
@@ -111,6 +113,7 @@ export default function CheckoutPage() {
           address_line1: checkout.address1.trim(),
           address_line2: checkout.address2.trim(),
           state: checkout.state.trim(),
+          delivery_area: checkout.deliveryArea.trim(),
           subtotal,
           tax_amount: tax,
           delivery_fee: deliveryFee,
@@ -139,20 +142,20 @@ export default function CheckoutPage() {
       toast.success(`Payment successful! Order #${order.id} created.`);
       clearCart();
       setIsModalOpen(false);
-      router.push('dashboard/orders');
+      router.push('/dashboard/orders');
     } catch (err: unknown) {
       console.error(err);
       toast.error(
         `Payment succeeded but order creation failed.\n` +
         `Reference: ${paystackReference}\n` +
-        `Error: ${ (err as Error).message || 'Unknown error' }`
+        `Error: ${(err as Error).message || 'Unknown error'}`
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ── New: Handle bank transfer receipt upload & order creation ──
+  // Bank transfer handler
   const handleBankTransferConfirm = async () => {
     if (!receiptFile) {
       toast.error("Please upload a payment receipt image");
@@ -165,7 +168,6 @@ export default function CheckoutPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Please sign in to place this order");
 
-      // 1. Upload receipt
       const fileExt = receiptFile.name.split('.').pop() || 'jpg';
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `receipts/${fileName}`;
@@ -180,15 +182,13 @@ export default function CheckoutPage() {
 
       if (uploadError) throw uploadError;
 
-      // 2. Get public URL (optional — or use signed URL later)
       const { data: urlData } = supabase.storage.from('payment_receipts').getPublicUrl(filePath);
 
-      // 3. Create order with status = 'pending'
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
-          paystack_reference: "Bank Transfer", // no paystack for transfer
+          paystack_reference: "Bank Transfer",
           payment_method: "bank_transfer",
           receipt_url: urlData.publicUrl || null,
           first_name: checkout.firstName.trim(),
@@ -199,19 +199,19 @@ export default function CheckoutPage() {
           address_line1: checkout.address1.trim(),
           address_line2: checkout.address2.trim(),
           state: checkout.state.trim(),
+          delivery_area: checkout.deliveryArea.trim(),
           subtotal,
           tax_amount: tax,
           delivery_fee: deliveryFee,
           custom_design_fee: customDesignFee,
           total_amount: total,
-          status: 'pending',           // ← important
+          status: 'pending',
         })
         .select('id')
         .single();
 
       if (orderError || !order?.id) throw orderError || new Error("Failed to create order");
 
-      // 4. Insert order items (same as before)
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_id: item.productId,
@@ -230,10 +230,10 @@ export default function CheckoutPage() {
       setShowBankModal(false);
       setIsModalOpen(false);
       setReceiptFile(null);
-      router.push('dashboard/orders');
+      router.push('/dashboard/orders');
     } catch (err: unknown) {
       console.error(err);
-      toast.error(`Failed to place order: ${ (err as Error).message || 'Unknown error' }`);
+      toast.error(`Failed to place order: ${(err as Error).message || 'Unknown error'}`);
     } finally {
       setUploadingReceipt(false);
     }
@@ -251,25 +251,25 @@ export default function CheckoutPage() {
     metadata: {
       custom_fields: [
         { display_name: 'Shipping Method', variable_name: 'shipping_method', value: checkout.shippingMethod },
-        { display_name: 'Delivery State', variable_name: 'delivery_state', value: checkout.state },
+        { display_name: 'Delivery Area', variable_name: 'delivery_area', value: checkout.deliveryArea },
       ],
     },
   };
 
   const paystackProps = {
     ...paystackConfig,
-    text: isSubmitting ? 'Processing...' : 'Paystack',
+    text: isSubmitting ? 'Processing...' : 'Pay with Paystack',
     onSuccess: (response: PaystackSuccessResponse) => handlePaymentSuccess(response.reference),
     onClose: () => {
       if (!isSubmitting) toast('Payment window closed');
     },
     disabled: !isFormValid || cartItems.length === 0 || isSubmitting,
-    className: `btn ${isFormValid && !isSubmitting ? 'btn-primary' : 'btn-disabled'} flex-1`,
+    className: `btn ${isFormValid && !isSubmitting && cartItems.length > 0 ? 'btn-primary' : 'btn-disabled'} flex-1`,
   };
 
   return (
     <div className="min-h-screen p-6 flex flex-col items-center">
-      {/* Order Summary Card — unchanged */}
+      {/* Order Summary */}
       <div className="card bg-base-100 shadow-xl w-full max-w-2xl mb-8">
         <div className="card-body">
           <h2 className="card-title text-2xl flex items-center gap-3 mb-4">
@@ -310,9 +310,18 @@ export default function CheckoutPage() {
                   <span>₦{tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Delivery Fee to {checkout.state}</span>
+                  <span>
+                    Delivery Fee {checkout.shippingMethod === 'pickup' ? '(Pickup)' : `to ${checkout.deliveryArea || 'selected area'}`}
+                  </span>
                   <span>₦{deliveryFee.toLocaleString()}</span>
                 </div>
+
+                {checkout.useDeliveryDiscount && deliveryFee > 0 && (
+                  <div className="flex justify-between text-xs text-success">
+                    <span>50% Delivery Discount Applied</span>
+                    <span>−₦{(deliveryFee).toLocaleString()}</span>
+                  </div>
+                )}
 
                 {customDesignFee > 0 && (
                   <div className="flex justify-between text-info">
@@ -345,18 +354,17 @@ export default function CheckoutPage() {
       {/* Checkout Modal */}
       <div className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         <div className="relative modal-box max-w-lg w-11/12">
-          <div
+          <button
+            className="absolute right-4 top-4 btn btn-ghost btn-circle"
             onClick={() => setIsModalOpen(false)}
-            className="hidden absolute right-4 top-4 btn btn-ghost p-4 rounded-full text-xs cursor-pointer"
           >
-            <X size={16} /> Close
-          </div>
+            <X size={20} />
+          </button>
 
           <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
             <User size={24} /> Checkout Information
           </h3>
 
-          {/* Form fields — unchanged */}
           <div className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -463,10 +471,10 @@ export default function CheckoutPage() {
                   <div className="relative">
                     <select
                       className="select select-bordered w-full pr-10"
+                      disabled
                       value={checkout.state}
                       onChange={(e) => {
                         checkout.setField('state', e.target.value);
-                        checkout.updateDeliveryFee();
                       }}
                     >
                       {nigerianStates.map((stateName) => (
@@ -481,27 +489,86 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
+
+                <div className="form-control">
+                  <label className="label">Delivery Area (Abuja & environs only)</label>
+                  <div className="relative">
+                    <select
+                      className="select select-bordered w-full pr-10"
+                      value={checkout.deliveryArea}
+                      onChange={(e) => checkout.setField('deliveryArea', e.target.value)}
+                    >
+                      <option value="">Select your delivery area</option>
+                      <optgroup label="₦6,000">
+                        {['Buhari', 'Kubwa', 'Idu', 'Lugbe', 'Kuje', 'Airport Road', 'Karashi', 'Orozo', 'Masaka', 'Giri', 'Madalla', 'Zuba'].map(a => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="₦5,000">
+                        {['Dutse', 'Gwaripa', 'Dawaki', 'Jabi', 'Jahi', 'Utako', 'Mabushi', 'Ado', 'Life Camp', 'Katampe', 'Katampe Extension', 'Galadimawa', 'Galadima'].map(a => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="₦4,000">
+                        {['Gudu', 'Apo', 'Garki', 'Maitama', 'Asokoro', 'Papei', 'Maraba', 'Abacha Road', 'City College', 'Nyanya', 'Kpegyi', 'Jikwoyi', 'Karu', 'New Karu', 'New Nyanya'].map(a => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="₦8,000">
+                        {['Gwagwalada', 'Kwali', 'Suleja', 'Abaji'].map(a => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-70" size={18} />
+                  </div>
+                </div>
+
+                {checkout.deliveryArea && deliveryFee > 0 && (
+                  <div className="form-control mt-4">
+                    <label className="label cursor-pointer justify-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-success"
+                        checked={checkout.useDeliveryDiscount}
+                        onChange={checkout.toggleDeliveryDiscount}
+                      />
+                      <span className="label-text font-medium">
+                        Apply 50% OFF delivery fee
+                        {checkout.useDeliveryDiscount && (
+                          <span className="text-success ml-2">
+                            (save ₦{(deliveryFee).toLocaleString()})
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  </div>
+                )}
+
+                <div className="text-sm opacity-70 mt-2">
+                  Current delivery fee: <strong>₦{deliveryFee.toLocaleString()}</strong>
+                  {checkout.useDeliveryDiscount && <span className="text-success ml-2">(50% discount applied)</span>}
+                </div>
               </>
             )}
           </div>
 
-          {/* Payment buttons */}
           <div className="modal-action mt-8 flex flex-col sm:flex-row gap-4">
             <button
-              className="btn btn-ghost flex-1"
+              className="btn btn-ghost flex-1 text-[8px] md:text-sm"
               onClick={() => setIsModalOpen(false)}
               disabled={isSubmitting || uploadingReceipt}
             >
-              <Backpack size={18}/> See Order
+              <Backpack size={18} /> Back to Cart
             </button>
 
             <button
-              className="btn btn-outline flex-1 gap-2"
+              className="btn btn-outline flex-1 gap-2 text-[8px] md:text-sm"
               onClick={() => setShowBankModal(true)}
               disabled={!isFormValid || cartItems.length === 0 || isSubmitting}
             >
               <Banknote size={18} />
-              Transfer
+              Bank Transfer
             </button>
 
             <PaystackButton {...paystackProps} />
@@ -509,15 +576,15 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      {/* Bank Transfer Confirmation Modal */}
+      {/* Bank Transfer Modal */}
       <div className={`modal ${showBankModal ? 'modal-open' : ''}`}>
         <div className="modal-box max-w-md">
-          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-[8px] md:text-sm">
             <Banknote size={24} /> Bank Transfer Payment
           </h3>
 
           <div className="bg-base-200 p-4 rounded-lg mb-6">
-            <p className="font-medium mb-2">{`Please transfer ₦${total.toLocaleString()}  to:`}</p>
+            <p className="font-medium mb-2">{`Please transfer ₦${total.toLocaleString()} to:`}</p>
             <p><strong>Account Number:</strong> 0130385926</p>
             <p><strong>Account Name:</strong> C-Chu Media LTD.</p>
             <p className="text-sm mt-3 text-warning">
@@ -564,7 +631,7 @@ export default function CheckoutPage() {
                 </>
               ) : (
                 <>
-                  <Check size={16} /> Continue & Place Order
+                  <Check size={16} /> Place Order
                 </>
               )}
             </button>

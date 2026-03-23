@@ -152,6 +152,7 @@ export default function OrdersPage() {
                     <div>
                       <p className="font-semibold">Delivery To</p>
                       <p>{order.state}</p>
+                      {order.delivery_area && <p className="text-xs opacity-70"> {order.delivery_area}</p>}
                       {order.address_line1 && <p className="text-xs opacity-70">{order.address_line1}</p>}
                       {order.address_line2 && <p className="text-xs opacity-70">{order.address_line2}</p>}
                     </div>
