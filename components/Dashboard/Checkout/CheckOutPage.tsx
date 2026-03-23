@@ -139,7 +139,7 @@ export default function CheckoutPage() {
       toast.success(`Payment successful! Order #${order.id} created.`);
       clearCart();
       setIsModalOpen(false);
-      router.push('/orders');
+      router.push('dashboard/orders');
     } catch (err: unknown) {
       console.error(err);
       toast.error(
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
       setShowBankModal(false);
       setIsModalOpen(false);
       setReceiptFile(null);
-      router.push('/orders');
+      router.push('dashboard/orders');
     } catch (err: unknown) {
       console.error(err);
       toast.error(`Failed to place order: ${ (err as Error).message || 'Unknown error' }`);
@@ -347,7 +347,7 @@ export default function CheckoutPage() {
         <div className="relative modal-box max-w-lg w-11/12">
           <div
             onClick={() => setIsModalOpen(false)}
-            className="absolute right-4 top-4 btn btn-ghost p-4 rounded-full text-xs cursor-pointer"
+            className="hidden absolute right-4 top-4 btn btn-ghost p-4 rounded-full text-xs cursor-pointer"
           >
             <X size={16} /> Close
           </div>
@@ -492,7 +492,7 @@ export default function CheckoutPage() {
               onClick={() => setIsModalOpen(false)}
               disabled={isSubmitting || uploadingReceipt}
             >
-              Cancel
+              <Backpack size={18}/> See Order
             </button>
 
             <button

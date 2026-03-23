@@ -75,14 +75,14 @@ export default function Dashboard() {
             )}
             
             {isAdmin ? (
-              <Link href="/admin"
+              <Link href="/dashboard/admin"
                 className="btn btn-secondary"
               >
                 <ListOrdered size={20} />
                 Orders
               </Link>
             ):
-            <Link href="/profile"
+            <Link href="/dashboard/profile"
                 className="btn btn-secondary"
               >
                 <UserRound size={20} />
