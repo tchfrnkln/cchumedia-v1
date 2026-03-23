@@ -9,11 +9,14 @@ type FormData = {
   price: number;
   order: number;
   image: File | null;
-  specs: Record<string, string[]>; // <-- added for dynamic specs
+  specs: Record<string, string[]>; // dynamic specs: key → array of options/values
 };
 
 interface DashboardState {
   searchQuery: string;
+  currentPage: number;
+  itemsPerPage: number;
+
   showAddModal: boolean;
   showEditModal: boolean;
   showCartDrawer: boolean;
@@ -25,6 +28,7 @@ interface DashboardState {
   initialize: () => Promise<void>;
 
   setSearchQuery: (value: string) => void;
+  setCurrentPage: (page: number) => void;
 
   openAddModal: () => void;
   closeAddModal: () => void;
@@ -44,6 +48,9 @@ interface DashboardState {
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
   searchQuery: '',
+  currentPage: 1,
+  itemsPerPage: 12, // can be 6, 9, 12, 15, etc. — feel free to adjust
+
   showAddModal: false,
   showEditModal: false,
   showCartDrawer: false,
@@ -56,21 +63,33 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     price: 0,
     order: 0,
     image: null,
-    specs: {}, // <-- initialize specs
+    specs: {},
   },
 
   initialize: async () => {
+    // Load user role first (needed for permissions)
     await useUserRoleStore.getState().getUserRole();
+    // Then fetch products
     await useProductStore.getState().fetchProducts();
   },
 
   setSearchQuery: (value) => set({ searchQuery: value }),
 
+  setCurrentPage: (page) => set({ currentPage: Math.max(1, page) }),
+
   openAddModal: () => set({ showAddModal: true }),
+
   closeAddModal: () =>
     set({
       showAddModal: false,
-      formData: { name: '', description: '', price: 0, order: 0, image: null, specs: {} },
+      formData: {
+        name: '',
+        description: '',
+        price: 0,
+        order: 0,
+        image: null,
+        specs: {},
+      },
     }),
 
   openEditModal: (product) =>
@@ -81,9 +100,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         name: product.name,
         description: product.description || '',
         price: product.price,
-        order: product.order,
-        image: null,
-        specs: product.specs || {}, // <-- load existing specs
+        order: product.order ?? 0,
+        image: null, // new image upload — old one stays unless replaced
+        specs: product.specs || {}, // load existing specs if any
       },
     }),
 
@@ -91,6 +110,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set({
       showEditModal: false,
       editProduct: null,
+      // Do **not** reset formData here — it might be useful for add modal
     }),
 
   openCartDrawer: () => set({ showCartDrawer: true }),
@@ -104,20 +124,25 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   handleAddProduct: async () => {
     const { formData } = get();
 
-    await useProductStore
-      .getState()
-      .addProduct(
-        formData.name,
-        formData.description,
-        formData.price,
-        formData.order,
-        formData.image,
-        formData.specs // <-- pass specs to product store
-      );
+    await useProductStore.getState().addProduct(
+      formData.name,
+      formData.description,
+      formData.price,
+      formData.order,
+      formData.image,
+      formData.specs
+    );
 
     set({
       showAddModal: false,
-      formData: { name: '', description: '', price: 0, order: 0, image: null, specs: {} },
+      formData: {
+        name: '',
+        description: '',
+        price: 0,
+        order: 0,
+        image: null,
+        specs: {},
+      },
     });
   },
 
@@ -125,17 +150,15 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const { editProduct, formData } = get();
     if (!editProduct) return;
 
-    await useProductStore
-      .getState()
-      .updateProduct(
-        editProduct.id,
-        formData.name,
-        formData.description,
-        formData.price,
-        formData.order,
-        formData.image,
-        formData.specs // <-- pass specs to update
-      );
+    await useProductStore.getState().updateProduct(
+      editProduct.id,
+      formData.name,
+      formData.description,
+      formData.price,
+      formData.order,
+      formData.image, // null = keep existing, File = replace
+      formData.specs
+    );
 
     set({
       showEditModal: false,
@@ -144,8 +167,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   handleDeleteProduct: async (id) => {
-    if (confirm('Are you sure?')) {
-      await useProductStore.getState().deleteProduct(id);
+    if (!confirm('Are you sure you want to delete this product?')) {
+      return;
     }
+
+    await useProductStore.getState().deleteProduct(id);
   },
 }));

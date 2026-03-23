@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, ListOrdered, UserRound } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ListOrdered, UserRound, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
 import { useUserRoleStore } from '@/store/authRole';
@@ -20,26 +20,29 @@ export default function Dashboard() {
 
   const {
     products,
-    isLoading: productsLoading
+    isLoading: productsLoading,
   } = useProductStore();
 
   const {
     searchQuery,
-    // showEditModal,
-    // formData,
+    currentPage,           // ← new
+    itemsPerPage,          // ← new (e.g. 6 or 9)
     setSearchQuery,
     openAddModal,
     openEditModal,
-    // closeEditModal,
-    // setFormData,
-    // handleUpdateProduct,
     handleDeleteProduct,
-    initialize
+    initialize,
+    setCurrentPage,        // ← you'll need to add this action in dashboardStore
   } = useDashboardStore();
 
   useEffect(() => {
     if (user) initialize();
   }, [user, initialize]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, setCurrentPage]);
 
   const filteredProducts = products.filter(
     (p) =>
@@ -47,22 +50,37 @@ export default function Dashboard() {
       p.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const scrollToview = () =>{
+    setTimeout(() => {
+      document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  // Pagination logic
+  const totalItems = filteredProducts.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
   const isAdminOrStaff = role === 'admin' || role === 'staff';
   const isAdmin = role === 'admin';
 
   if (!user) return null;
+
+
 
   return (
     <div className="w-full min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-
-        <div className="flex justify-between items-center mb-6">
+        <div id="product-grid"  className="flex justify-between items-center mb-6">
           <h1 className="md:text-3xl font-bold">All Products</h1>
 
           <div className="flex items-center gap-4">
-            <Cart/>
+            <Cart />
 
             {isAdminOrStaff && (
               <button
@@ -73,26 +91,22 @@ export default function Dashboard() {
                 Add Product
               </button>
             )}
-            
+
             {isAdmin ? (
-              <Link href="/dashboard/admin"
-                className="btn btn-secondary"
-              >
+              <Link href="/dashboard/admin" className="btn btn-secondary">
                 <ListOrdered size={20} />
                 Orders
               </Link>
-            ):
-            <Link href="/dashboard/profile"
-                className="btn btn-secondary"
-              >
+            ) : (
+              <Link href="/dashboard/profile" className="btn btn-secondary">
                 <UserRound size={20} />
                 Profile
-              </Link>}
+              </Link>
+            )}
           </div>
         </div>
 
         {/* Search */}
-
         <div className="form-control mb-6">
           <div className="input-group">
             <input
@@ -111,7 +125,6 @@ export default function Dashboard() {
         </div>
 
         {/* Products */}
-
         {productsLoading ? (
           <div className="flex justify-center">
             <span className="loading loading-spinner loading-lg"></span>
@@ -119,76 +132,101 @@ export default function Dashboard() {
         ) : filteredProducts.length === 0 ? (
           <p className="text-center text-lg">No products found.</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer">
-                <figure>
-                  {product.image_url ? (
-                    <Image
-                      src={product.image_url}
-                      alt={product.name}
-                      width={300}
-                      height={200}
-                      className="h-48 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
-                      No Image
-                    </div>
-                  )}
-                </figure>
-
-                <div className="card-body">
-                  <h2 className="card-title">{product.name}</h2>
-
-                  <p className='line-clamp-3'>{product.description || 'No description'}</p>
-
-                  <div className="card-actions justify-end">
-
-                    {isAdminOrStaff ? (
-                      <>
-                        <button
-                          className="btn btn-outline"
-                          onClick={() => openEditModal(product)}
-                        >
-                          <Edit size={16} />
-                        </button>
-
-                        <button
-                          className="btn btn-error btn-outline"
-                          onClick={() => handleDeleteProduct(product.id)}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {paginatedProducts.map((product) => (
+                <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer">
+                  <figure>
+                    {product.image_url ? (
+                      <Image
+                        src={product.image_url}
+                        alt={product.name}
+                        width={300}
+                        height={200}
+                        className="h-48 w-full object-cover"
+                      />
                     ) : (
-                      <button
-                        className="btn btn-primary"
-                        onClick={() =>
-                          router.push(`/products/${product.id}`)
-                        }
-                      >
-                        Order Now
-                      </button>
+                      <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
+                        No Image
+                      </div>
                     )}
+                  </figure>
 
+                  <div className="card-body">
+                    <h2 className="card-title">{product.name}</h2>
+
+                    <p className="line-clamp-3">{product.description || 'No description'}</p>
+
+                    <div className="card-actions justify-end">
+                      {isAdminOrStaff ? (
+                        <>
+                          <button
+                            className="btn btn-outline"
+                            onClick={() => openEditModal(product)}
+                          >
+                            <Edit size={16} />
+                          </button>
+
+                          <button
+                            className="btn btn-error btn-outline"
+                            onClick={() => handleDeleteProduct(product.id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => router.push(`/products/${product.id}`)}
+                        >
+                          Order Now
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-10 mb-6">
+                <button
+                  className="btn btn-outline btn-sm"
+                  disabled={currentPage === 1}
+                  onClick={() => {
+                    setCurrentPage(currentPage - 1)
+                    scrollToview()
+                  }}
+                >
+                  <ChevronLeft size={18} />
+                  Previous
+                </button>
+
+                <span className="text-sm font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  className="btn btn-outline btn-sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>{
+                    setCurrentPage(currentPage + 1)
+                    scrollToview()
+                  }}
+                >
+                  Next
+                  <ChevronRight size={18} />
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
-        {/* Add Modal */}
-        <AddProducts/>
-
-        {/* Edit Modal */}
-
-        <EditProducts/>
-
-        {/* Cart Drawer */}
-        <CartDrawer/>
-
+        {/* Modals & Drawer */}
+        <AddProducts />
+        <EditProducts />
+        <CartDrawer />
       </div>
     </div>
   );
