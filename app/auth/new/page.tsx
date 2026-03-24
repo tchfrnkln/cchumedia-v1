@@ -14,7 +14,7 @@ const page = () => {
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           }>
-            <SignupPage />
+          <SignupPage />
       </Suspense>
       <Footer/>
     </div>

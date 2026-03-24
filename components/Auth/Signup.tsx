@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { User, Mail, MapPin, Lock, Eye, EyeOff, UserCheck } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -18,13 +19,15 @@ export default function SignupPage() {
   const [gender, setGender] = useState<string>('');
   const [location, setLocation] = useState<string>('');
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const { signup, isLoading, error, success } = useAuthStore();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      // You could also use a toast or dedicated error field
       alert("Passwords don't match!");
       return;
     }
@@ -36,66 +39,76 @@ export default function SignupPage() {
 
     try {
       await signup(email, password, fullName, gender, location, affiliateId);
-      // Optional: clear form or redirect after success
-      // window.location.href = '/login'; // or show success message only
-
-      router.push("/auth")
+      router.push("/auth");
     } catch {
       // error is already set in store
     }
   };
 
   return (
-    <div className="w-full md:flex items-center justify-center bg-base-100">
-      <div className="w-full md:w-3/5 bg-base-100 md:shadow-xl rounded-lg p-4 flex justify-center items-center">
-        <div className="w-full px-8 md:p-4 md:px-24">
-          <h1 className="card-title text-2xl justify-center md:justify-start py-4">Sign up</h1>
+    <div className="min-h-max flex items-center justify-center p-4">
+      <div className="card w-full max-w-lg bg-base-100 shadow-2xl">
+        <div className="card-body p-8 md:p-10">
+          {/* Header */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+              <UserCheck className="w-9 h-9 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-center">Create Account</h1>
+            <p className="text-base-content/60 mt-2 text-center">
+              Join us today and get started
+            </p>
+          </div>
 
-          <form onSubmit={handleSignup} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-6">
             {/* Full Name */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Full Name</span>
+                <span className="label-text font-medium">Full Name</span>
               </label>
-              <input
-                type="text"
-                placeholder="John Doe"
-                className="input input-bordered md:w-2/3"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  className="input input-bordered w-full pl-11"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+                <User className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50" />
+              </div>
             </div>
 
             {/* Email */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Email</span>
+                <span className="label-text font-medium">Email Address</span>
               </label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                className="input input-bordered md:w-2/3"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  className="input input-bordered w-full pl-11"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Mail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50" />
+              </div>
             </div>
 
             {/* Gender */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Gender</span>
+                <span className="label-text font-medium">Gender</span>
               </label>
               <select
-                className="select select-bordered md:w-2/3"
+                className="select select-bordered w-full"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 required
               >
-                <option value="" disabled>
-                  Select gender
-                </option>
+                <option value="" disabled>Select gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="prefer-not-to-say">Prefer not to say</option>
@@ -103,78 +116,109 @@ export default function SignupPage() {
             </div>
 
             {/* Location */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Location (State)</span>
+                <span className="label-text font-medium">Location (State)</span>
               </label>
-              <input
-                type="text"
-                placeholder="Abuja"
-                className="input input-bordered md:w-2/3"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Abuja"
+                  className="input input-bordered w-full pl-11"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  required
+                />
+                <MapPin className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50" />
+              </div>
             </div>
 
             {/* Password */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Password</span>
+                <span className="label-text font-medium">Password</span>
               </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="input input-bordered md:w-2/3"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="input input-bordered w-full pl-11 pr-11"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Lock className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {/* Confirm Password */}
-            <div className="form-control flex flex-col">
+            <div className="form-control">
               <label className="label">
-                <span className="label-text text-xs">Confirm Password</span>
+                <span className="label-text font-medium">Confirm Password</span>
               </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="input input-bordered md:w-2/3"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="input input-bordered w-full pl-11 pr-11"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <Lock className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/50" />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
-            {error && <p className="text-error text-sm mt-2">{error}</p>}
-            {success && <p className="text-success text-sm mt-2">{success}</p>}
+            {error && (
+              <div className="alert alert-error text-sm py-2">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="alert alert-success text-sm py-2">
+                {success}
+              </div>
+            )}
 
-            <div className="form-control mt-6">
-              <button
-                className="btn btn-primary"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="loading loading-spinner"></span> Signing up...
-                  </>
-                ) : (
-                  'Create Account'
-                )}
-              </button>
-            </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="btn btn-primary w-full h-12 text-base"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Creating account...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </button>
           </form>
 
-          <div className="text-center mt-4 text-sm">
+          {/* Login Link */}
+          <div className="text-center mt-8 text-sm">
             Already have an account?{' '}
-            <Link href="/auth" className="link link-primary">
-              Login
+            <Link href="/auth" className="link link-primary font-medium hover:underline">
+              Sign in
             </Link>
           </div>
-
         </div>
       </div>
     </div>
