@@ -36,8 +36,8 @@ export default function Dashboard() {
   } = useDashboardStore();
 
   useEffect(() => {
-    if (user) initialize();
-  }, [user, initialize]);
+    initialize();
+  }, [initialize]);
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function Dashboard() {
   const isAdminOrStaff = role === 'admin' || role === 'staff';
   const isAdmin = role === 'admin';
 
-  if (!user) return null;
+  // if (!user) return null;
 
 
 
@@ -92,12 +92,13 @@ export default function Dashboard() {
               </button>
             )}
 
-            {isAdmin ? (
+            {isAdmin && (
               <Link href="/dashboard/admin" className="btn btn-secondary">
                 <ListOrdered size={20} />
                 Orders
               </Link>
-            ) : (
+            )}
+            { user && (
               <Link href="/dashboard/profile" className="btn btn-secondary">
                 <UserRound size={20} />
                 Profile
