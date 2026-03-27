@@ -21,7 +21,7 @@ export default function LogoutButton({
   showIcon = true,
   fullWidth = false,
 }: LogoutButtonProps) {
-  const { logout, isLoading } = useAuthStore();
+  const { logout, isLoading, user } = useAuthStore();
   const { clearRole } = useUserRoleStore();
 
   const handleLogout = async () => {
@@ -40,6 +40,8 @@ export default function LogoutButton({
       toast.error('Failed to log out', { id: 'logout-toast' });
     }
   };
+
+  if(!user) return null
 
   return (
     <button
