@@ -11,7 +11,6 @@ import {
   Phone,
   ShoppingCart,
   User,
-  CreditCard,
   Banknote,
   X,
   Check,
@@ -97,12 +96,19 @@ export default function CheckoutPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Please sign in to complete your order");
+      let userId: string;
+
+      // if (!user ) throw new Error("Please sign in to complete your order");
+      if(user){
+        userId = user.id;
+      }else{
+        userId = `${crypto.randomUUID()}`;
+      }
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          user_id: user.id,
+          user_id: userId, //add Guest id here
           paystack_reference: paystackReference,
           payment_method: 'paystack',
           first_name: checkout.firstName.trim(),
@@ -183,11 +189,18 @@ export default function CheckoutPage() {
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage.from('payment_receipts').getPublicUrl(filePath);
+      let userId: string;
+
+      if(user){
+        userId = user.id;
+      }else{
+        userId = `${crypto.randomUUID()}`;
+      }
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           paystack_reference: "Bank Transfer",
           payment_method: "bank_transfer",
           receipt_url: urlData.publicUrl || null,
@@ -313,7 +326,7 @@ export default function CheckoutPage() {
                   <span>
                     Delivery Fee {checkout.shippingMethod === 'pickup' ? '(Pickup)' : `to ${checkout.deliveryArea || 'selected area'}`}
                   </span>
-                  <span>₦{deliveryFee.toLocaleString()}</span>
+                  <span>₦{(deliveryFee*2).toLocaleString()}</span>
                 </div>
 
                 {checkout.useDeliveryDiscount && deliveryFee > 0 && (
