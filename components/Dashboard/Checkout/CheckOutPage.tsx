@@ -96,14 +96,8 @@ export default function CheckoutPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      let userId: string;
+      const userId = user?.id || null;
 
-      // if (!user ) throw new Error("Please sign in to complete your order");
-      if(user){
-        userId = user.id;
-      }else{
-        userId = `${crypto.randomUUID()}`;
-      }
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -148,7 +142,8 @@ export default function CheckoutPage() {
       toast.success(`Payment successful! Order #${order.id} created.`);
       clearCart();
       setIsModalOpen(false);
-      router.push('/dashboard/orders');
+      router.push(`/dashboard/success?order_id=${order.id}`);
+      // router.push('/dashboard/orders')
     } catch (err: unknown) {
       console.error(err);
       toast.error(
@@ -172,10 +167,10 @@ export default function CheckoutPage() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Please sign in to place this order");
+      // if (!user) throw new Error("Please sign in to place this order");
 
       const fileExt = receiptFile.name.split('.').pop() || 'jpg';
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
       const filePath = `receipts/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -189,13 +184,7 @@ export default function CheckoutPage() {
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage.from('payment_receipts').getPublicUrl(filePath);
-      let userId: string;
-
-      if(user){
-        userId = user.id;
-      }else{
-        userId = `${crypto.randomUUID()}`;
-      }
+      const userId = user?.id || null;
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -243,7 +232,8 @@ export default function CheckoutPage() {
       setShowBankModal(false);
       setIsModalOpen(false);
       setReceiptFile(null);
-      router.push('/dashboard/orders');
+      router.push(`/dashboard/success?order_id=${order.id}`);
+      // router.push('/dashboard/orders');
     } catch (err: unknown) {
       console.error(err);
       toast.error(`Failed to place order: ${(err as Error).message || 'Unknown error'}`);

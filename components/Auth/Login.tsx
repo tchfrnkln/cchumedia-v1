@@ -24,8 +24,8 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      if(redirect !== null){
-        window.location.href = redirect;
+      if((redirect !== null) && (redirect !== 'null')) {
+        window.location.href = '/dashboard/checkout';
       } else{
         window.location.href = '/dashboard';
       }
