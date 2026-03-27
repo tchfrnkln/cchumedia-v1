@@ -5,8 +5,14 @@ import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+
+  const searchParams = useSearchParams();
+  const affiliateId = searchParams.get('aff');
+  const redirect = searchParams.get('redirect');
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,9 +21,14 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
       await login(email, password);
-      window.location.href = '/dashboard';
+      if(redirect !== null){
+        window.location.href = redirect;
+      } else{
+        window.location.href = '/dashboard';
+      }
     } catch {
       setLoading(false);
     }
@@ -115,7 +126,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-4 mt-8 text-sm">
             <div className="text-center">
               Don&apos;t have an account?{' '}
-              <Link href="/auth/new" className="link link-primary font-medium hover:underline">
+              <Link href={`/auth/new?aff=${affiliateId}&redirect=${redirect}`} className="link link-primary font-medium hover:underline">
                 Sign up
               </Link>
             </div>

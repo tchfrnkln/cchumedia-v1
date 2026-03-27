@@ -34,7 +34,7 @@ export default function LogoutButton({
       toast.success('Logged out successfully!', { id: 'logout-toast' });
 
       // Redirect after logout (adjust path as needed)
-      window.location.href = '/auth';
+      window.location.href = '/dashboard';
       // Alternative: use next/navigation if you prefer router.push('/login')
     } catch {
       toast.error('Failed to log out', { id: 'logout-toast' });

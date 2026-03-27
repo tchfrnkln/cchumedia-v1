@@ -11,6 +11,7 @@ export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const affiliateId = searchParams.get('aff');
+  const redirect = searchParams.get('redirect');
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -215,7 +216,7 @@ export default function SignupPage() {
           {/* Login Link */}
           <div className="text-center mt-8 text-sm">
             Already have an account?{' '}
-            <Link href="/auth" className="link link-primary font-medium hover:underline">
+            <Link href={`/auth?aff=${affiliateId}&redirect=${redirect}`} className="link link-primary font-medium hover:underline">
               Sign in
             </Link>
           </div>
