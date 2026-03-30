@@ -1,2 +1,30 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+
+:root {
+  --cchu-red: #C0392B;
+  --cchu-red-dark: #922B21;
+  --cchu-red-light: #F5B7B1;
+  --cchu-red-pale: #FDEDEC;
+  --cchu-black: #1A1A1A;
+  --cchu-dark: #2C2C2C;
+  --cchu-gray: #6B6B6B;
+  --cchu-light: #F7F7F5;
+  --cchu-white: #FFFFFF;
+  --cchu-border: #E8E8E5;
+  --cchu-gold: #D4A843;
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--cchu-black);
+  background: var(--cchu-white);
+  line-height: 1.6;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Syne', sans-serif;
+}
