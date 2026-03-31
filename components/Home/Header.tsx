@@ -1,7 +1,10 @@
+"use client"
+import Image from 'next/image';
 import Fab from './Header/Fab'
 import Hero from './Header/Hero'
 import Socials from './Header/Socials'
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 function Header() {
   return (
@@ -19,12 +22,11 @@ function Header() {
 export default Header
 
 export function Header2() {
+  const router = useRouter(); 
   return (
     <nav className="w-full sticky top-0 z-100 bg-white/96 backdrop-blur-xl border-b border-[var(--cchu-border)] px-6 md:px-10 h-16 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 bg-(--cchu-red) rounded-lg flex items-center justify-center">
-          <span className="text-white font-black text-lg">P</span>
-        </div>
+      <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+        <Image src='/images/icon.png' alt="cchu media" width={50} height={50}></Image>
         <div>
           <div className="font-bold text-lg tracking-tight">PrintHub</div>
           <small className="text-[10px] text-[var(--cchu-gray)] -mt-1 block">
@@ -34,11 +36,11 @@ export function Header2() {
       </div>
 
       <div className="hidden md:flex items-center gap-8 text-sm text-[var(--cchu-gray)]">
-        <Link href="#how-it-works" className="hover:text-[var(--cchu-red)] transition-colors">How it works</Link>
-        <Link href="#services" className="hover:text-[var(--cchu-red)] transition-colors">Services</Link>
-        <Link href="#starter-kits" className="hover:text-[var(--cchu-red)] transition-colors">Starter Kits</Link>
-        <Link href="#affiliate" className="hover:text-[var(--cchu-red)] transition-colors">Earn with us</Link>
-        <Link href="#contact" className="hover:text-[var(--cchu-red)] transition-colors">Contact</Link>
+        <Link href="./start" className="hover:text-[var(--cchu-red)] transition-colors">Starter Kits</Link>
+        <Link href="./campaign" className="hover:text-[var(--cchu-red)] transition-colors">Campaign</Link>
+        <Link href="./publishing" className="hover:text-[var(--cchu-red)] transition-colors">Publishing</Link>
+        <Link href="./earn" className="hover:text-[var(--cchu-red)] transition-colors">Earn with us</Link>
+        <Link href="./contact" className="hover:text-[var(--cchu-red)] transition-colors">Contact</Link>
       </div>
 
       <div className="flex items-center gap-3 text-sm">

@@ -46,9 +46,10 @@ export function Footer2() {
       <div className="max-w-6xl mx-auto px-6 md:px-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div>
+             <Image src='/images/icon.png' alt="cchu media" width={50} height={50}></Image>
             <div className="font-bold text-2xl mb-1">PrintHub</div>
-            <div className="text-sm text-white/40 italic mb-4">by C-Chu Media Limited</div>
-            <p className="text-sm text-white/50 max-w-xs">
+             <Socials withMail={false} light/>     
+            <p className="text-sm text-white/50 max-w-xs mt-3">
               Professional printing and branding solutions for businesses, organisations, and individuals across Nigeria.
             </p>
           </div>
@@ -90,7 +91,7 @@ export function Footer2() {
         </div>
 
         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-white/40">
-          <div>© 2025 C-Chu Media Limited. All rights reserved.</div>
+          <div className='flex gap-1'>© 2025 <p className='text-(--cchu-red) m-0 p-0'>C-Chu Media Limited.</p> All rights reserved. Birthing your Imagination...</div>
           <div className="mt-3 md:mt-0">printhub.cchumedia.com</div>
         </div>
       </div>

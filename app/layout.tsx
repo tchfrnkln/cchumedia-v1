@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import Breadcrumbs from "@/components/Dashboard/Breadcrumbs";
+import type { Metadata } from "next";
 
 const syne = Syne({
   subsets: ['latin'],
@@ -25,15 +24,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" data-theme="light">
-      <body
-        className={`${syne.variable} ${dmSans.variable} antialiased`}
-      >
-        <Breadcrumbs />
+      <body className={`${syne.variable} ${dmSans.variable} antialiased`}>
         {children}
         <Toaster position="bottom-right" />
       </body>
