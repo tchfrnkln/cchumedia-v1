@@ -12,7 +12,11 @@ import CartDrawer, { Cart } from './Products/CartDrawer';
 import AddProducts, { EditProducts } from './Products/AlterProducts';
 import Link from 'next/link';
 
-export default function Dashboard() {
+interface DashboardProps {
+  initialSearch?: string;   // ← New optional prop
+}
+
+export default function Dashboard({ initialSearch = '' }: DashboardProps) {
   const router = useRouter();
 
   const { user } = useAuthStore();
@@ -25,19 +29,27 @@ export default function Dashboard() {
 
   const {
     searchQuery,
-    currentPage,           // ← new
-    itemsPerPage,          // ← new (e.g. 6 or 9)
+    currentPage,
+    itemsPerPage,
     setSearchQuery,
     openAddModal,
     openEditModal,
     handleDeleteProduct,
     initialize,
-    setCurrentPage,        // ← you'll need to add this action in dashboardStore
+    setCurrentPage,
   } = useDashboardStore();
 
+  // Initialize data
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  // Set initial search query if provided (only on first render)
+  useEffect(() => {
+    if (initialSearch && initialSearch.trim() !== '') {
+      setSearchQuery(initialSearch.trim());
+    }
+  }, [initialSearch, setSearchQuery]);
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -50,11 +62,11 @@ export default function Dashboard() {
       p.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const scrollToview = () =>{
+  const scrollToview = () => {
     setTimeout(() => {
       document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
-  }
+  };
 
   // Pagination logic
   const totalItems = filteredProducts.length;
@@ -67,17 +79,13 @@ export default function Dashboard() {
   const isAdminOrStaff = role === 'admin' || role === 'staff';
   const isAdmin = role === 'admin';
 
-  // if (!user) return null;
-
-
-
   return (
     <div className="w-full min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div id="product-grid"  className="flex justify-between items-center mb-6">
-          <h1 className="md:text-3xl font-bold">All Products</h1>
+        <div id="product-grid" className="flex justify-between items-center mb-6">
+          <h1 className="md:text-3xl font-bold">{initialSearch != '' ? initialSearch : `All Products`}</h1>
 
           <div className="flex items-center gap-4">
             <Cart />
@@ -98,7 +106,7 @@ export default function Dashboard() {
                 Orders
               </Link>
             )}
-            { user && (
+            {user && (
               <Link href="/dashboard/profile" className="btn bg-(--cchu-lilac) text-white">
                 <UserRound size={20} />
                 Profile
@@ -136,12 +144,14 @@ export default function Dashboard() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {paginatedProducts.map((product) => (
-                <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer"
-                onClick={()=>{
-                  if(!(isAdminOrStaff)){
-                    router.push(`/dashboard/products/${product.id}`)
-                  }
-                }}
+                <div 
+                  key={product.id} 
+                  className="card bg-base-100 shadow-xl cursor-pointer"
+                  onClick={() => {
+                    if (!isAdminOrStaff) {
+                      router.push(`/dashboard/products/${product.id}`);
+                    }
+                  }}
                 >
                   <figure>
                     {product.image_url ? (
@@ -202,8 +212,8 @@ export default function Dashboard() {
                   className="btn btn-outline btn-sm"
                   disabled={currentPage === 1}
                   onClick={() => {
-                    setCurrentPage(currentPage - 1)
-                    scrollToview()
+                    setCurrentPage(currentPage - 1);
+                    scrollToview();
                   }}
                 >
                   <ChevronLeft size={18} />
@@ -217,9 +227,9 @@ export default function Dashboard() {
                 <button
                   className="btn btn-outline btn-sm"
                   disabled={currentPage === totalPages}
-                  onClick={() =>{
-                    setCurrentPage(currentPage + 1)
-                    scrollToview()
+                  onClick={() => {
+                    setCurrentPage(currentPage + 1);
+                    scrollToview();
                   }}
                 >
                   Next
