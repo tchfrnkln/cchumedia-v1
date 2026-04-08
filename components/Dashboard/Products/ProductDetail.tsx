@@ -122,7 +122,7 @@ export default function ProductDetailPage() {
           )}
 
           <button
-            className="hidden md:flex w-75 mt-4 btn btn-primary btn-lg flex-1 gap-2 text-xs p-4"
+            className="hidden md:flex w-75 mt-4 btn bg-(--cchu-lilac) btn-lg flex-1 gap-2 text-xs p-4 text-white"
             onClick={openPopover}
             disabled={quantity < minQty}
           >
@@ -137,7 +137,7 @@ export default function ProductDetailPage() {
             <h1 className="text-3xl md:text-4xl font-bold mb-3">{product.name}</h1>
 
             {/* PRICE */}
-            <div className="badge badge-lg badge-secondary mb-4">
+            <div className="badge badge-lg badge-(--cchu-light-lilac) bg-(--cchu-light-lilac) text-(--cchu-black) mb-4">
               ₦{Number(unitPrice.toFixed(2)).toLocaleString()} per unit
             </div>
 
@@ -216,7 +216,7 @@ export default function ProductDetailPage() {
               <div className="stats w-full">
                 <div className="stat md:place-items-center">
                   <div className="stat-title">Total Amount</div>
-                  <div className="stat-value text-primary">
+                  <div className="stat-value text-(--cchu-lilac)">
                     ₦{Number(totalPrice.toFixed(2)).toLocaleString()}
                   </div>
                   <div className="stat-desc">

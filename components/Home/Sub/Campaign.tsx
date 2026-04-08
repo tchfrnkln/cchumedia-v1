@@ -40,7 +40,7 @@ export default function ElectionCampaign() {
           </p>
 
           <div className="flex flex-wrap gap-4 mb-12">
-            <a 
+            <a target="_blank" rel="noopener noreferrer"
               href="https://wa.me/2348052929523?text=Hello%2C%20I%20need%20election%20campaign%20materials"
               className="inline-flex items-center gap-3 px-10 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold rounded-2xl transition-all text-lg"
             >
@@ -117,7 +117,7 @@ export default function ElectionCampaign() {
               <div className="pkg-head p-8">
                 <span className="pkg-badge inline-block bg-[var(--cchu-light)] text-[var(--cchu-dark)] text-xs font-semibold px-5 py-1.5 rounded-full">Ward / LGA Level</span>
                 <div className="pkg-name font-display font-black text-3xl mt-6">Campaign Starter</div>
-                <div className="flex flex-col md:flex-row pkg-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col pkg-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   ₦50,000 <small className="text-base font-normal text-[var(--cchu-gray)]">flat fee</small>
                 </div>
                 <p className="pkg-tag text-[var(--cchu-gray)] mt-5">&quot;Get your name and face in front of every voter in your ward&quot;</p>
@@ -136,7 +136,7 @@ export default function ElectionCampaign() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Campaign%20Starter%20Package" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Campaign%20Starter%20Package" 
                    className="btn-pkg block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-2xl font-display font-bold transition-all">
                   Order Campaign Starter
                 </a>
@@ -148,10 +148,10 @@ export default function ElectionCampaign() {
               <div className="pkg-head p-8">
                 <div className="flex items-center gap-3">
                   <span className="pkg-badge inline-block bg-[var(--cchu-red-pale)] text-[var(--cchu-red)] text-xs font-semibold px-5 py-1.5 rounded-full">State Assembly / House of Reps</span>
-                  <span className="pkg-pop bg-[var(--cchu-red)] text-white text-[10px] font-bold px-4 py-1 rounded-full tracking-wider">Most Popular</span>
+                  <span className="pkg-pop bg-[var(--cchu-red)] text-white text-[8px] font-bold px-4 py-1 rounded-full tracking-wider text-center">Most Popular</span>
                 </div>
                 <div className="pkg-name font-display font-black text-3xl mt-6">Campaign Visibility</div>
-                <div className="flex flex-col md:flex-row pkg-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col pkg-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   ₦200,000 <small className="text-base font-normal text-[var(--cchu-gray)]">custom quote</small>
                 </div>
                 <p className="pkg-tag text-[var(--cchu-gray)] mt-5">&quot;Dominate every street, market, and community in your constituency&quot;</p>
@@ -171,7 +171,7 @@ export default function ElectionCampaign() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Campaign%20Visibility%20Package" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Campaign%20Visibility%20Package" 
                    className="btn-pkg block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-2xl font-display font-bold transition-all">
                   Get Visibility Package
                 </a>
@@ -183,7 +183,7 @@ export default function ElectionCampaign() {
               <div className="pkg-head p-8">
                 <span className="pkg-badge inline-block bg-[#FBF5E6] text-[#8B6914] text-xs font-semibold px-5 py-1.5 rounded-full">Governorship / Senate</span>
                 <div className="pkg-name font-display font-black text-3xl mt-6">Full Campaign Suite</div>
-                <div className="flex flex-col md:flex-row pkg-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col pkg-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   Custom <small className="text-base font-normal text-[var(--cchu-gray)]">quote based on scope</small>
                 </div>
                 <p className="pkg-tag text-[var(--cchu-gray)] mt-5">&quot;A complete, coordinated campaign visual presence across every LGA&quot;</p>
@@ -204,7 +204,7 @@ export default function ElectionCampaign() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20discuss%20the%20Full%20Campaign%20Suite" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20discuss%20the%20Full%20Campaign%20Suite" 
                    className="btn-pkg block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-2xl font-display font-bold transition-all">
                   Request Custom Quote
                 </a>
@@ -256,7 +256,7 @@ export default function ElectionCampaign() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <a 
+            <a target="_blank" rel="noopener noreferrer"
               href="https://wa.me/2348052929523?text=Hello%2C%20I%20need%20urgent%20campaign%20materials"
               className="px-12 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold rounded-2xl transition-all"
             >

@@ -41,7 +41,7 @@ export default function StarterKits() {
             >
               Choose Your Kit →
             </a>
-            <a 
+            <a target="_blank" rel="noopener noreferrer"
               href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20know%20more%20about%20the%20Business%20Starter%20Kit"
               className="inline-flex items-center px-10 py-4 border border-white/30 hover:border-white/60 text-white/80 hover:text-white rounded-2xl transition-all text-lg"
             >
@@ -68,7 +68,7 @@ export default function StarterKits() {
               <div className="kit-head p-8">
                 <span className="kit-badge inline-block bg-[#F0F0EC] text-[#555] text-xs font-semibold px-5 py-1.5 rounded-full">Starter</span>
                 <div className="kit-name font-display font-black text-3xl mt-6">Basic Kit</div>
-                <div className="flex flex-col md:flex-row kit-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col kit-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   ₦35,000 <small className="text-base font-normal text-[var(--cchu-gray)]">flat fee</small>
                 </div>
                 <p className="kit-tagline text-[var(--cchu-gray)] mt-5 italic">&quot;You just registered your business. Now look like one&quot;</p>
@@ -92,7 +92,7 @@ export default function StarterKits() {
               </div>
 
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="/auth/new" className="btn-kit block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-2xl font-display font-bold transition-all">
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20discuss%20the%20Basic%20Kit" className="btn-kit block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-2xl font-display font-bold transition-all">
                   Order Basic Kit
                 </a>
               </div>
@@ -106,7 +106,7 @@ export default function StarterKits() {
                   <span className="kit-pop bg-[var(--cchu-red)] text-white text-[10px] font-bold px-4 py-1 rounded-full tracking-wider">Most Popular</span>
                 </div>
                 <div className="kit-name font-display font-black text-3xl mt-6">Business Kit</div>
-                <div className="flex flex-col md:flex-row kit-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col kit-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   ₦65,000 <small className="text-base font-normal text-[var(--cchu-gray)]">flat fee</small>
                 </div>
                 <p className="kit-tagline text-[var(--cchu-gray)] mt-5 italic">&quot;Look established from day one&quot;</p>
@@ -131,7 +131,7 @@ export default function StarterKits() {
               </div>
 
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="/auth/new" className="btn-kit block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-2xl font-display font-bold transition-all">
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20discuss%20the%20Business%20Kit" className="btn-kit block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-2xl font-display font-bold transition-all">
                   Order Business Kit
                 </a>
               </div>
@@ -142,7 +142,7 @@ export default function StarterKits() {
               <div className="kit-head p-8">
                 <span className="kit-badge inline-block bg-[#FBF5E6] text-[#8B6914] text-xs font-semibold px-5 py-1.5 rounded-full">Premium</span>
                 <div className="kit-name font-display font-black text-3xl mt-6">Corporate Kit</div>
-                <div className="flex flex-col md:flex-row kit-price font-display text-4xl md:text-5xl font-black text-[var(--cchu-red)] mt-3">
+                <div className="flex flex-col kit-price font-display text-4xl font-black text-[var(--cchu-red)] mt-3">
                   ₦120,000 <small className="text-base font-normal text-[var(--cchu-gray)]">flat fee</small>
                 </div>
                 <p className="kit-tagline text-[var(--cchu-gray)] mt-5 italic">&quot;Arrive in every room looking like a million naira&quot;</p>
@@ -169,7 +169,7 @@ export default function StarterKits() {
               </div>
 
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="/auth/new" className="btn-kit block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-2xl font-display font-bold transition-all">
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20discuss%20the%20Corporate%20Kit" className="btn-kit block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-2xl font-display font-bold transition-all">
                   Order Corporate Kit
                 </a>
               </div>
@@ -269,7 +269,7 @@ export default function StarterKits() {
             >
               Choose Your Kit →
             </a>
-            <a 
+            <a target="_blank" rel="noopener noreferrer"
               href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20to%20order%20a%20Business%20Starter%20Kit"
               className="px-12 py-4 border border-white/40 text-white hover:border-white hover:text-white font-medium rounded-2xl transition-all"
             >

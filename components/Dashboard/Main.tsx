@@ -93,13 +93,13 @@ export default function Dashboard() {
             )}
 
             {isAdmin && (
-              <Link href="/dashboard/admin" className="btn btn-secondary">
+              <Link href="/dashboard/admin" className="btn bg-(--cchu-gold) text-white">
                 <ListOrdered size={20} />
                 Orders
               </Link>
             )}
             { user && (
-              <Link href="/dashboard/profile" className="btn btn-secondary">
+              <Link href="/dashboard/profile" className="btn bg-(--cchu-lilac) text-white">
                 <UserRound size={20} />
                 Profile
               </Link>
@@ -136,7 +136,13 @@ export default function Dashboard() {
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {paginatedProducts.map((product) => (
-                <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer">
+                <div key={product.id} className="card bg-base-100 shadow-xl cursor-pointer"
+                onClick={()=>{
+                  if(!(isAdminOrStaff)){
+                    router.push(`/dashboard/products/${product.id}`)
+                  }
+                }}
+                >
                   <figure>
                     {product.image_url ? (
                       <Image
@@ -177,8 +183,8 @@ export default function Dashboard() {
                         </>
                       ) : (
                         <button
-                          className="btn btn-primary"
-                          onClick={() => router.push(`/products/${product.id}`)}
+                          className="btn bg-[#9B96C8] text-white"
+                          onClick={() => router.push(`/dashboard/products/${product.id}`)}
                         >
                           Order Now
                         </button>

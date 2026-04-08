@@ -38,7 +38,7 @@ export default function BookPublishing() {
               </p>
 
               <div className="flex flex-wrap gap-4 mt-10">
-                <a 
+                <a target="_blank" rel="noopener noreferrer"
                   href="https://wa.me/2348052929523?text=Hello%2C%20I%20would%20like%20a%20free%20book%20publishing%20consultation"
                   className="inline-flex items-center gap-3 px-10 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold rounded-2xl transition-all text-lg"
                 >
@@ -169,7 +169,7 @@ export default function BookPublishing() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Basic%20Publish%20Package" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Basic%20Publish%20Package" 
                    className="btn-pkg block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-2xl font-display font-bold">
                   Get Started
                 </a>
@@ -207,7 +207,7 @@ export default function BookPublishing() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Pro%20Publish%20Package" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20want%20the%20Pro%20Publish%20Package" 
                    className="btn-pkg block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-2xl font-display font-bold">
                   Publish Professionally
                 </a>
@@ -240,7 +240,7 @@ export default function BookPublishing() {
               </div>
 
               <div className="pkg-footer p-6 border-t border-[var(--cchu-border)] bg-white mt-auto">
-                <a href="https://wa.me/2348052929523?text=Hello%2C%20I%20need%20an%20institutional%20publishing%20quote" 
+                <a target="_blank" rel="noopener noreferrer" href="https://wa.me/2348052929523?text=Hello%2C%20I%20need%20an%20institutional%20publishing%20quote" 
                    className="btn-pkg block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-2xl font-display font-bold">
                   Request Bulk Quote
                 </a>
@@ -289,7 +289,7 @@ export default function BookPublishing() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <a 
+            <a target="_blank" rel="noopener noreferrer" 
               href="https://wa.me/2348052929523?text=Hello%2C%20I%20would%20like%20a%20free%20book%20publishing%20consultation"
               className="px-12 py-4 bg-white text-[var(--cchu-red)] font-display font-bold rounded-2xl hover:bg-black hover:text-white transition-all"
             >

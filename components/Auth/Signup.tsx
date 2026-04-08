@@ -47,13 +47,13 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-max flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="card w-full max-w-lg bg-base-100 shadow-2xl">
         <div className="card-body p-8 md:p-10">
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-              <UserCheck className="w-9 h-9 text-primary" />
+            <div className="w-16 h-16 bg-(--cchu-red)/10 rounded-2xl flex items-center justify-center mb-4">
+              <UserCheck className="w-9 h-9 text-(--cchu-red)" />
             </div>
             <h1 className="text-3xl font-bold text-center">Create Account</h1>
             <p className="text-base-content/60 mt-2 text-center">
@@ -199,7 +199,7 @@ export default function SignupPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="btn btn-primary w-full h-12 text-base"
+              className="btn bg-(--cchu-red) w-full h-12 text-white"
               disabled={isLoading}
             >
               {isLoading ? (

@@ -63,12 +63,12 @@ export default function UpdatePassword() {
   }
 
   return (
-    <div className="min-h-max flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-              <KeyRound className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 bg-(--cchu-red)/10 rounded-full flex items-center justify-center">
+              <KeyRound className="w-8 h-8 text-(--cchu-red)" />
             </div>
           </div>
 
@@ -133,7 +133,7 @@ export default function UpdatePassword() {
 
             <button
               type="submit"
-              className="btn btn-primary w-full"
+              className="btn bg-(--cchu-red) text-white w-full"
               disabled={isLoading}
             >
               {isLoading ? 'Updating password...' : 'Update Password'}

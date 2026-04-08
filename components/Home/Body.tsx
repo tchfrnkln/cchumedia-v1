@@ -143,12 +143,12 @@ export function Body2() {
             </p>
 
             <div className="hero-ctas flex flex-wrap gap-4 mb-12">
-              <a 
-                href="/auth/new" 
+              <Link 
+                href="/dashboard" 
                 className="btn-hero-primary inline-flex items-center gap-3 px-8 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold rounded-xl transition-all active:scale-95"
               >
                 Place Your Order →
-              </a>
+              </Link>
               <a 
                 href="#services" 
                 className="btn-hero-secondary px-8 py-4 border border-white/30 text-white/80 hover:border-white/60 hover:text-white rounded-xl transition-all"
@@ -309,7 +309,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <a href="/auth/new" className="btn-kit basic block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-xl font-display font-bold">Order Starter Kit</a>
+                <Link href="/auth/new" className="btn-kit basic block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-xl font-display font-bold">Order Starter Kit</Link>
               </div>
             </div>
 
@@ -333,7 +333,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <a href="/auth/new" className="btn-kit standard block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-xl font-display font-bold">Order Business Kit</a>
+                <Link href="/auth/new" className="btn-kit standard block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-xl font-display font-bold">Order Business Kit</Link>
               </div>
             </div>
 
@@ -354,7 +354,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <a href="/auth/new" className="btn-kit premium block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-xl font-display font-bold">Order Corporate Kit</a>
+                <Link href="/auth/new" className="btn-kit premium block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-xl font-display font-bold">Order Corporate Kit</Link>
               </div>
             </div>
           </div>
@@ -392,7 +392,7 @@ export function Body2() {
             <div className="affiliate-tag text-white/70 text-xs font-semibold tracking-widest uppercase mb-4">Affiliate program</div>
             <h2 className="affiliate-title font-display font-black text-5xl leading-tight text-white">Refer clients.<br />Earn for life.</h2>
             <p className="affiliate-sub text-white/80 text-lg mt-6">Join our affiliate program and earn commission on every order your referrals place — forever.</p>
-            <a href="/auth/new" className="btn-affiliate inline-block mt-8 bg-white text-[var(--cchu-red)] hover:bg-black hover:text-white font-display font-bold px-10 py-4 rounded-2xl">Join free — Get your link →</a>
+            <Link href="/auth/new" className="btn-affiliate inline-block mt-8 bg-white text-[var(--cchu-red)] hover:bg-black hover:text-white font-display font-bold px-10 py-4 rounded-2xl">Join free — Get your link →</Link>
           </div>
 
           <div className="commission-cards space-y-4">
@@ -456,19 +456,19 @@ export function Body2() {
           <p className="cta-sub text-white/60 text-lg mt-6">Register free on PrintHub and place your first order today.</p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <a 
+            <Link 
               href="/auth/new" 
               className="inline-flex items-center justify-center px-10 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold text-lg rounded-2xl transition-all"
             >
               Register Free & Order →
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="https://wa.me/2348052929523" 
               target="_blank"
               className="inline-flex items-center justify-center px-10 py-4 border border-white/30 hover:border-white/60 text-white/90 hover:text-white rounded-2xl transition-all text-lg"
             >
               WhatsApp us first
-            </a>
+            </Link>
           </div>
         </div>
       </section>

@@ -2,7 +2,6 @@ import Image from 'next/image'
 import React from 'react'
 import Socials from './Header/Socials'
 import Link from 'next/link'
-import { CalendarCheck2, MapPinCheck } from 'lucide-react'
 
 const Footer = () => {
   return (
@@ -68,10 +67,10 @@ export function Footer2() {
           <div>
             <div className="uppercase text-xs tracking-widest text-white/40 mb-4">Company</div>
             <div className="space-y-2 text-sm text-white/70">
-              <a href="https://cchumedia.com/index.php/about-us/" className="block hover:text-white">About Us</a>
-              <a href="https://cchumedia.com/index.php/works/" className="block hover:text-white">Our Work</a>
-              <a href="#affiliate" className="block hover:text-white">Affiliate Program</a>
+              <a href="/start#kits" className="block hover:text-white">Kit</a>
               <Link href="/auth" className="block hover:text-white">Login</Link>
+              <a href="/contact" className="block hover:text-white">Contact</a>
+              <a href="/earn" className="block hover:text-white">Affiliate Program</a>
             </div>
           </div>
 

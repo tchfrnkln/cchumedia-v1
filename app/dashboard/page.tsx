@@ -3,14 +3,14 @@
 import LogoutButton from '@/components/Auth/LogOut';
 import Dashboard from '@/components/Dashboard/Main';
 import Footer from '@/components/Home/Footer';
-import Socials from '@/components/Home/Header/Socials';
+import { Header2 } from '@/components/Home/Header';
 
 export default function DashboadHome() {
 
   return (
     <div className='w-full min-h-screen'>
-      <div className='w-full fixed top-0 left-0 bg-[#DCD8EF] p-4 z-10'>
-        <Socials withMail/>
+      <div className='w-full fixed top-0 left-0 z-10 border-b-2 border-(--cchu-red)'>
+        <Header2/>
       </div>
       <Dashboard/>
       <div className="fixed bottom-4 right-4">
