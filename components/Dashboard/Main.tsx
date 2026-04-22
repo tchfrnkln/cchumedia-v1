@@ -7,17 +7,19 @@ import { useProductStore } from '@/store/productStore';
 import { useUserRoleStore } from '@/store/authRole';
 import { useDashboardStore } from '@/store/dashboardStore';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation'; // ← added
 import CartDrawer, { Cart } from './Products/CartDrawer';
 import AddProducts, { EditProducts } from './Products/AlterProducts';
 import Link from 'next/link';
+import CategorySidebar from './Products/CategorySidebar';
 
 interface DashboardProps {
-  initialSearch?: string;   // ← New optional prop
+  initialSearch?: string;
 }
 
 export default function Dashboard({ initialSearch = '' }: DashboardProps) {
   const router = useRouter();
+  const searchParams = useSearchParams(); // ← added
 
   const { user } = useAuthStore();
   const { role } = useUserRoleStore();
@@ -44,12 +46,16 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
     initialize();
   }, [initialize]);
 
-  // Set initial search query if provided (only on first render)
+  // Search from ?item=banner
   useEffect(() => {
-    if (initialSearch && initialSearch.trim() !== '') {
+    const item = searchParams.get('item');
+
+    if (item && item.trim() !== '') {
+      setSearchQuery(item.trim());
+    } else if (initialSearch && initialSearch.trim() !== '') {
       setSearchQuery(initialSearch.trim());
     }
-  }, [initialSearch, setSearchQuery]);
+  }, [searchParams, initialSearch, setSearchQuery]);
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -64,9 +70,26 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
 
   const scrollToview = () => {
     setTimeout(() => {
-      document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('product-grid')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }, 80);
   };
+
+  // Auto focus first item after reload/search
+  useEffect(() => {
+    if (filteredProducts.length > 0) {
+      setTimeout(() => {
+        document
+          .getElementById(`product-${filteredProducts[0].id}`)
+          ?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+      }, 200);
+    }
+  }, [filteredProducts]);
 
   // Pagination logic
   const totalItems = filteredProducts.length;
@@ -85,7 +108,9 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
 
         {/* Header */}
         <div id="product-grid" className="flex justify-between items-center mb-6">
-          <h1 className="md:text-3xl font-bold">{initialSearch != '' ? initialSearch : `All Products`}</h1>
+          <h1 className="md:text-3xl font-bold">
+            {searchQuery !== '' ? searchQuery : `All Products`}
+          </h1>
 
           <div className="flex items-center gap-4">
             <Cart />
@@ -106,6 +131,7 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
                 Orders
               </Link>
             )}
+
             {user && (
               <Link href="/dashboard/profile" className="btn bg-(--cchu-lilac) text-white">
                 <UserRound size={20} />
@@ -134,6 +160,8 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
         </div>
 
         {/* Products */}
+        <div className="flex flex-col gap-6">
+          <CategorySidebar />
         {productsLoading ? (
           <div className="flex justify-center">
             <span className="loading loading-spinner loading-lg"></span>
@@ -141,7 +169,7 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
         ) : filteredProducts.length === 0 ? (
           <p className="text-center text-lg">No products found.</p>
         ) : (
-          <>
+          <div className='flex flex-col'>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {paginatedProducts.map((product) => (
                 <div 
@@ -237,8 +265,9 @@ export default function Dashboard({ initialSearch = '' }: DashboardProps) {
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
+        </div>
 
         {/* Modals & Drawer */}
         <AddProducts />

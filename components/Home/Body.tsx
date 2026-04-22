@@ -107,7 +107,7 @@ export function Body2() {
   return (
     <main className="w-full">
       {/* HERO SECTION */}
-      <section className="min-h-[92vh] bg-[var(--cchu-black)] flex items-center relative overflow-hidden px-6 md:px-10 py-20">
+      <section className="min-h-[92vh] md:max-h-[92vh] bg-[var(--cchu-black)] flex items-center relative overflow-hidden px-6 md:px-10 py-20">
   
         {/* Gradient radial patterns (kept from original) */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(192,57,43,0.15)_0%,transparent_50%)]" />
@@ -127,22 +127,22 @@ export function Body2() {
 
         <div className="w-full md:max-w-7xl mx-auto flex md:grid md:grid-cols-2 md:gap-12 items-center relative z-10">
           <div className="hero-content flex flex-col w-full">
-            <div className="hero-badge inline-flex md:items-center gap-2 bg-red-950/50 border border-red-900/50 text-[#F5B7B1] text-xs font-medium px-5 py-2 rounded-full mb-6">
+            <div className="hero-badge inline-flex md:items-center gap-2 bg-red-950/50 border border-red-900/50 text-[#F5B7B1] text-xs font-medium px-5 py-2 rounded-full mb-6 md:mb-0">
               <div className="hero-badge-dot w-2 h-2 bg-[var(--cchu-red)] rounded-full animate-pulse" />
               Now live — Order printing online
             </div>
 
-            <h1 className="font-display font-black text-5xl md:text-7xl leading-[1.05] tracking-[-0.02em] text-white mb-6">
+            <h1 className="font-display font-black text-5xl md:text-7xl leading-[1.05] tracking-[-0.02em] text-white mb-6 md:mb-2">
               Your print orders,<br />
               <em className="text-[var(--cchu-red)] not-italic">handled online.</em>
             </h1>
 
-            <p className="hero-sub text-lg md:text-xl text-white/65 max-w-lg mb-10 font-light">
+            <p className="hero-sub text-lg md:text-xl text-white/65 max-w-lg mb-10 font-light md:mb-1">
               Browse, book, and manage all your printing needs from your phone or laptop. 
               Banners, branding, souvenirs, books and more — trusted by 3,000+ clients since 2011.
             </p>
 
-            <div className="hero-ctas flex flex-wrap gap-4 mb-12">
+            <div className="w-full hero-ctas flex flex-wrap justify-start gap-4 mb-12 md:mb-2">
               <Link 
                 href="/dashboard" 
                 className="btn-hero-primary inline-flex items-center gap-3 px-8 py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white font-display font-bold rounded-xl transition-all active:scale-95"
@@ -204,8 +204,10 @@ export function Body2() {
         </div>
       </section>
 
+      <Dashboard initialSearch='Card'/>
+
       {/* TRUST BAR */}
-      <div className="trust-bar bg-[var(--cchu-light)] border-b border-[var(--cchu-border)] py-5 px-6 md:px-10 flex items-center gap-8 overflow-hidden">
+      <div className="hidden trust-bar bg-[var(--cchu-light)] border-b border-[var(--cchu-border)] py-5 px-6 md:px-10 flex items-center gap-8 overflow-hidden">
         <div className="trust-label text-xs font-semibold uppercase tracking-widest text-[var(--cchu-gray)] whitespace-nowrap">Trusted by</div>
         <div className="trust-divider w-px h-7 bg-[var(--cchu-border)]" />
         <div className="trust-logos flex gap-8 items-center overflow-x-auto pb-1">
@@ -234,7 +236,7 @@ export function Body2() {
               { num: "02", icon: "🖨️", title: "We Print & Produce", desc: "Our team reviews your order and produces with precision at our Karu, Abuja studio." },
               { num: "03", icon: "🚀", title: "Pick up or Deliver", desc: "Collect from our Abuja outlet or get nationwide delivery. Installation available in FCT." }
             ].map((step, i) => (
-              <div key={i} className="step-card bg-[var(--cchu-light)] border border-[var(--cchu-border)] rounded-3xl p-10 hover:border-[var(--cchu-red)] transition-all hover:-translate-y-2 relative">
+              <div key={i} className="step-card bg-[var(--cchu-light)] border border-[var(--cchu-border)] rounded-3xl p-10 hover:border-[var(--cchu-red)] relative">
                 <div className="step-num font-display text-7xl text-[var(--cchu-red)] opacity-10 absolute top-8 right-8">{step.num}</div>
                 <div className="step-icon w-14 h-14 bg-[var(--cchu-red-pale)] rounded-2xl flex items-center justify-center text-3xl mb-6">
                   {step.icon}
@@ -260,27 +262,25 @@ export function Body2() {
 
           <div className="services-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
             {[
-              { icon: "🏷️", name: "Banners & Large Format", desc: "Indoor & outdoor banners, roll-ups, backdrops.", price: "From ₦5,000" },
-              { icon: "👕", name: "Branded Souvenirs", desc: "Custom shirts, caps, mugs, bags & corporate gifts.", price: "Get a quote" },
-              { icon: "📄", name: "Papers & Stationery", desc: "Business cards, letterheads, flyers & catalogues.", price: "From ₦3,000" },
-              { icon: "🏷️", name: "Stickers & Labels", desc: "Product labels, SAV stickers & custom packaging.", price: "From ₦4,000" },
-              { icon: "🪧", name: "Signage & Installation", desc: "Professional signage with on-site installation.", price: "From ₦80,000" },
-              { icon: "📚", name: "Book Publishing", desc: "End-to-end book design, printing & binding.", price: "From ₦80,000" },
-              { icon: "🗳️", name: "Campaign Materials", desc: "Election packages with fast turnaround.", price: "From ₦50,000" },
-              { icon: "🎨", name: "Graphic Design", desc: "Logos, brand identity & marketing visuals.", price: "Get a quote" },
+              { icon: "🏷️", name: "Banners & Large Format", desc: "Indoor & outdoor banners, roll-ups, backdrops.", price: "From ₦5,000", item:'Banner' },
+              { icon: "👕", name: "Branded Souvenirs", desc: "Custom shirts, caps, mugs, bags & corporate gifts.", price: "Get a quote", item:'Branded' },
+              { icon: "📄", name: "Papers & Stationery", desc: "Business cards, letterheads, flyers & catalogues.", price: "From ₦3,000", item:'Paper' },
+              { icon: "🏷️", name: "Stickers & Labels", desc: "Product labels, SAV stickers & custom packaging.", price: "From ₦4,000", item:'Sticker' },
+              { icon: "🪧", name: "Signage & Installation", desc: "Professional signage with on-site installation.", price: "From ₦80,000", item:'Signage' },
+              { icon: "📚", name: "Book Publishing", desc: "End-to-end book design, printing & binding.", price: "From ₦80,000", item:'Book' },
+              { icon: "🗳️", name: "Campaign Materials", desc: "Election packages with fast turnaround.", price: "From ₦50,000", item:'Campaign' },
+              // { icon: "🎨", name: "Graphic Design", desc: "Logos, brand identity & marketing visuals.", price: "Get a quote" },
             ].map((service, i) => (
-              <div key={i} className="service-card bg-white border border-[var(--cchu-border)] rounded-2xl p-8 hover:border-[var(--cchu-red)] hover:shadow-xl transition-all group">
+              <a target='_blank' href={`/dashboard?item=${service.item}`} key={i} className="service-card bg-white border border-[var(--cchu-border)] rounded-2xl p-8 hover:border-[var(--cchu-red)] hover:shadow-xl transition-all group">
                 <div className="service-icon text-4xl mb-6 group-hover:scale-110 transition-transform">{service.icon}</div>
                 <div className="service-name font-display font-bold text-xl mb-3">{service.name}</div>
                 <p className="service-desc text-[var(--cchu-gray)] text-sm leading-relaxed flex-1">{service.desc}</p>
                 <div className="service-price mt-6 text-[var(--cchu-red)] font-semibold">{service.price}</div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
       </section>
-
-      <Dashboard/>
 
       {/* STARTER KITS */}
       <section className="section py-24 px-6 md:px-10" id="starter-kits">
@@ -309,7 +309,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <Link href="/auth/new" className="btn-kit basic block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-xl font-display font-bold">Order Starter Kit</Link>
+                <a target='_blank' href="https://wa.me/2348052929523?text=Hi!%20I%20want%20to%20order%20the%20Basic%20Starter%20kit%20(%E2%82%A635%2C000)" className="btn-kit basic block text-center py-4 border border-[var(--cchu-border)] hover:border-[var(--cchu-red)] hover:text-[var(--cchu-red)] rounded-xl font-display font-bold">Order Starter Kit</a>
               </div>
             </div>
 
@@ -333,7 +333,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <Link href="/auth/new" className="btn-kit standard block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-xl font-display font-bold">Order Business Kit</Link>
+                <a target='_blank' href="https://wa.me/2348052929523?text=Hi!%20I%20want%20to%20order%20the%20Business%20Pro%20kit%20(%E2%82%A665%2C000)" className="btn-kit standard block text-center py-4 bg-[var(--cchu-red)] hover:bg-[var(--cchu-red-dark)] text-white rounded-xl font-display font-bold">Order Business Kit</a>
               </div>
             </div>
 
@@ -354,7 +354,7 @@ export function Body2() {
                 ))}
               </div>
               <div className="kit-footer p-6 border-t border-[var(--cchu-border)] bg-white">
-                <Link href="/auth/new" className="btn-kit premium block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-xl font-display font-bold">Order Corporate Kit</Link>
+                <a target='_blank' href="https://wa.me/2348052929523?text=Hi!%20I%20want%20to%20order%20the%20Corporate%20Suite%20kit%20(%E2%82%A6120%2C000)" className="btn-kit premium block text-center py-4 bg-[var(--cchu-black)] hover:bg-zinc-800 text-white rounded-xl font-display font-bold">Order Corporate Kit</a>
               </div>
             </div>
           </div>
