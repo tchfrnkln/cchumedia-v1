@@ -1,0 +1,96 @@
+'use client';
+import { useState } from 'react';
+import { useStore } from '../../lib/store';
+import Modal from './ui/Modal';
+import Button from './ui/Button';
+
+export default function AuthModal() {
+  const { login, register, showToast, closeModal } = useStore();
+  const [tab, setTab] = useState('login');
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleLogin = async () => {
+    setErr(''); setLoading(true);
+    const res = login(form.email, form.password);
+    setLoading(false);
+    if (res.error) { setErr(res.error); return; }
+    showToast(`Welcome back, ${res.user.name}! 👋`, 'success');
+    closeModal();
+  };
+
+  const handleRegister = async () => {
+    setErr(''); setLoading(true);
+    const res = register(form);
+    setLoading(false);
+    if (res.error) { setErr(res.error); return; }
+    showToast(`Account created! Welcome, ${res.user.name}! 🎉`, 'success');
+    closeModal();
+  };
+
+  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
+
+  return (
+    <Modal type="auth" maxWidth="max-w-md">
+      <div className="p-6">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 mb-6">
+          <div className="w-10 h-10 bg-brand text-white font-display font-black text-xl rounded-xl flex items-center justify-center">P</div>
+          <div>
+            <div className="font-display font-black text-base">PrintHub</div>
+            <div className="text-xs text-gray-400">by C-Chu Media Ltd</div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-6">
+          {['login', 'register'].map(t => (
+            <button key={t} onClick={() => { setTab(t); setErr(''); }}
+              className={`flex-1 py-2 text-sm font-display font-bold rounded-lg transition-all ${tab === t ? 'bg-white dark:bg-gray-900 shadow text-brand' : 'text-gray-500 hover:text-gray-700'}`}>
+              {t === 'login' ? '🔑 Login' : '✨ Register'}
+            </button>
+          ))}
+        </div>
+
+        {err && (
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 text-sm rounded-xl border border-red-100 dark:border-red-900">
+            ⚠️ {err}
+          </div>
+        )}
+
+        {tab === 'login' ? (
+          <div className="space-y-3">
+            <input className={inp} type="email" placeholder="Email address" value={form.email} onChange={e => set('email', e.target.value)} />
+            <input className={inp} type="password" placeholder="Password" value={form.password} onChange={e => set('password', e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+            <Button className="w-full" onClick={handleLogin} disabled={loading}>
+              {loading ? 'Logging in...' : 'Login to Account'}
+            </Button>
+            <p className="text-xs text-center text-gray-400">
+              Demo admin: <strong>admin@cchumedia.com</strong> / <strong>admin123</strong>
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <input className={inp} placeholder="Full name *" value={form.name} onChange={e => set('name', e.target.value)} />
+            <input className={inp} type="email" placeholder="Email address *" value={form.email} onChange={e => set('email', e.target.value)} />
+            <input className={inp} type="tel" placeholder="Phone number" value={form.phone} onChange={e => set('phone', e.target.value)} />
+            <input className={inp} type="password" placeholder="Password *" value={form.password} onChange={e => set('password', e.target.value)} />
+            <Button className="w-full" onClick={handleRegister} disabled={loading}>
+              {loading ? 'Creating account...' : 'Create Account'}
+            </Button>
+          </div>
+        )}
+
+        <p className="text-xs text-center text-gray-400 mt-4">
+          By continuing you agree to our{' '}
+          <span className="text-brand cursor-pointer hover:underline">Terms</span> &{' '}
+          <span className="text-brand cursor-pointer hover:underline">Privacy Policy</span>
+        </p>
+      </div>
+    </Modal>
+  );
+}

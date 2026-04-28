@@ -1,4 +1,4 @@
-import { Syne, DM_Sans, Montserrat, Open_Sans } from "next/font/google";
+import { Montserrat, Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
@@ -19,7 +19,7 @@ const openSans = Open_Sans({
 
 export const metadata: Metadata = {
   title: 'PrintHub by C-Chu Media — Order Your Printing Online',
-  description: 'Professional printing and branding solutions in Abuja, Nigeria.',
+  description: `Nigeria's premier print & branding e-commerce portal. Order online, design online, delivered fast.`,
 };
 
 export default function RootLayout({

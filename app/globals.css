@@ -1,32 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&display=swap');
+
 @import "tailwindcss";
-@plugin "daisyui";
+@reference "tailwindcss";
 
 
 :root {
-  --cchu-red: #C0392B;
-  --cchu-red-dark: #922B21;
-  --cchu-red-light: #F5B7B1;
-  --cchu-red-pale: #FDEDEC;
-  --cchu-black: #1A1A1A;
-  --cchu-dark: #2C2C2C;
-  --cchu-gray: #6B6B6B;
-  --cchu-light: #F7F7F5;
-  --cchu-white: #FFFFFF;
-  --cchu-border: #E8E8E5;
-  --cchu-gold: #D4A843;
-  --cchu-lilac: #9B96C8;
-  --cchu-light-lilac: #DCD8EF;
-  --radius: 12px;
-  --radius-lg: 20px;
+  --font-display: 'Montserrat', sans-serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --brand: #D42B2B;
+  --brand-dark: #a81f1f;
+  --accent: #7B7EC8;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'DM Sans', system-ui, sans-serif;
-  color: var(--cchu-black);
-  background: var(--cchu-white);
-  line-height: 1.6;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-h1, h2, h3, .font-display {
-  font-family: 'Syne', sans-serif;
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-gray-100 dark:bg-gray-900; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-700 rounded-full; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pulse-brand {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,43,43,.4); }
+  50% { box-shadow: 0 0 0 8px rgba(212,43,43,0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+.animate-slide-right { animation: slideInRight 0.3s ease forwards; }
+.animate-toast { animation: toastIn 0.25s ease forwards; }
+.animate-pulse-brand { animation: pulse-brand 2s infinite; }
+
+/* ── CUSTOM COMPONENTS ── */
+.font-display { font-family: var(--font-display); }
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(212,43,43,0.3) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 20%, rgba(123,126,200,0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.nav-mega-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 680px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  z-index: 200;
+}
+.dark .nav-mega-menu {
+  background: #111118;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0; right: 0;
+  width: 420px;
+  height: 100vh;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.product-card:hover .product-card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+.product-card-actions {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.2s ease;
+}
+
+/* Flash sale timer */
+.timer-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  min-width: 52px;
+}
+
+@theme {
+  /* ── Brand ── */
+  --color-brand:         #D42B2B;   /* bg-brand          */
+  --color-brand-dark:    #a81f1f;   /* bg-brand-dark      */
+  --color-brand-deeper:  #7a1515;   /* bg-brand-deeper    */
+  --color-brand-light:   #fdf0f0;   /* bg-brand-light     */
+  --color-brand-mid:     #f5c6c6;   /* bg-brand-mid       */
+
+  /* ── Accent ── */
+  --color-accent:        #7B7EC8;   /* bg-accent          */
+  --color-accent-soft:   #ecedf8;   /* bg-accent-soft     */
+  --color-accent-dark:   #5a5da0;   /* bg-accent-dark     */
+
+  /* ── Fonts ── */
+  --font-display: 'Montserrat', sans-serif;   /* font-display */
+  --font-body:    'Source Sans 3', sans-serif; /* font-body    */
 }
