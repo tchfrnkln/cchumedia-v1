@@ -15,6 +15,17 @@ const TURNAROUNDS = ['Standard (5-7 days)', 'Express (3 days)', 'Rush (24hrs)'];
 
 const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury', Sale:'sale', Popular:'accent', New:'green' }[b] || 'brand');
 
+  const Chip = ({ options, field, config }) => (
+    <div className="flex flex-wrap gap-2">
+      {options.map(opt => (
+        <button key={opt} onClick={() => setC(field, opt)}
+          className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${config[field] === opt ? 'bg-brand text-white border-brand' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand'}`}>
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+
 export default function ProductPage() {
   const { route, navigate, addToCart, toggleWishlist, wishlist, showToast, openModal } = useStore();
   const product = PRODUCTS.find(p => p.id === route.params?.id);
@@ -44,17 +55,6 @@ export default function ProductPage() {
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
-
-  const Chip = ({ options, field }) => (
-    <div className="flex flex-wrap gap-2">
-      {options.map(opt => (
-        <button key={opt} onClick={() => setC(field, opt)}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${config[field] === opt ? 'bg-brand text-white border-brand' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand'}`}>
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
 
   return (
     <div className="animate-fade-in">
@@ -139,19 +139,19 @@ export default function ProductPage() {
 
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Size</label>
-                <Chip options={SIZES} field="size" />
+                <Chip options={SIZES} field="size" config={config} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Material Quality</label>
-                <Chip options={MATERIALS} field="material" />
+                <Chip options={MATERIALS} field="material" config={config} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Finishing</label>
-                <Chip options={FINISHINGS} field="finishing" />
+                <Chip options={FINISHINGS} field="finishing" config={config} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Turnaround</label>
-                <Chip options={TURNAROUNDS} field="turnaround" />
+                <Chip options={TURNAROUNDS} field="turnaround" config={config} />
               </div>
 
               <div>

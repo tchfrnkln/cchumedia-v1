@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useStore } from '../../lib/store';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
+import { useAuthStore } from '@/store/authStore';
 
 export default function AuthModal() {
-  const { login, register, showToast, closeModal } = useStore();
+  const { register, showToast, closeModal } = useStore();
+  const { login, user } = useAuthStore();
   const [tab, setTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
@@ -14,12 +16,22 @@ export default function AuthModal() {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleLogin = async () => {
+    console.log(form.email, form.password);
+    if(form.email === user.email){
+      showToast(`Welcome back, ${user.email}! 👋`, 'success');
+      return closeModal();
+    }
     setErr(''); setLoading(true);
-    const res = login(form.email, form.password);
+    await login(form.email, form.password)
+    .then(() => {
+      showToast(`Welcome back, ${user.email}! 👋`, 'success');
+      closeModal();
+    })
+    .catch(() => {
+      setErr("Invalid login credentials"); 
+      return;
+    })
     setLoading(false);
-    if (res.error) { setErr(res.error); return; }
-    showToast(`Welcome back, ${res.user.name}! 👋`, 'success');
-    closeModal();
   };
 
   const handleRegister = async () => {

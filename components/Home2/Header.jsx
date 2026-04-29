@@ -129,7 +129,7 @@ export default function Header() {
                 {/* Theme toggle */}
                 <button
                   onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   title="Toggle theme"
                 >
                   {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
