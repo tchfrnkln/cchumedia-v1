@@ -24,7 +24,7 @@ export default function AuthModal() {
     setErr(''); setLoading(true);
     await login(form.email, form.password)
     .then(() => {
-      showToast(`Welcome back, ${user.email}! 👋`, 'success');
+      showToast(`Welcome back! 👋`, 'success');
       closeModal();
     })
     .catch(() => {
