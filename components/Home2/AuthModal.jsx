@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 
 export default function AuthModal() {
   const { register, showToast, closeModal } = useStore();
-  const { login, user } = useAuthStore();
+  const { login, signup, user } = useAuthStore();
   const [tab, setTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
@@ -16,7 +16,6 @@ export default function AuthModal() {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleLogin = async () => {
-    console.log(form.email, form.password);
     if(form.email === user?.email){
       showToast(`Welcome back, ${user.email}! 👋`, 'success');
       return closeModal();
@@ -27,8 +26,8 @@ export default function AuthModal() {
       showToast(`Welcome back! 👋`, 'success');
       closeModal();
     })
-    .catch(() => {
-      setErr("Invalid login credentials"); 
+    .catch((e) => {
+      setErr(`Login failed. ${e.message}`); 
       return;
     })
     setLoading(false);
@@ -36,11 +35,20 @@ export default function AuthModal() {
 
   const handleRegister = async () => {
     setErr(''); setLoading(true);
-    const res = register(form);
+    
+    await signup( form.email, form.password, form.name, "", form.phone, "")
+    .then(() => {
+      showToast(`Account created! Welcome! 🎉`, 'success');
+      closeModal();
+    })
+    .catch((e) => {
+      if(e.message.includes("already registered")){
+        return setErr('Registration failed.');
+      }else{
+        return setErr(`Registration failed. ${e.message}`);
+      }
+    })
     setLoading(false);
-    if (res.error) { setErr(res.error); return; }
-    showToast(`Account created! Welcome, ${res.user.name}! 🎉`, 'success');
-    closeModal();
   };
 
   const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
@@ -74,27 +82,26 @@ export default function AuthModal() {
         )}
 
         {tab === 'login' ? (
-          <div className="space-y-3">
-            <input className={inp} type="email" placeholder="Email address" value={form.email} onChange={e => set('email', e.target.value)} />
-            <input className={inp} type="password" placeholder="Password" value={form.password} onChange={e => set('password', e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()} />
-            <Button className="w-full" onClick={handleLogin} disabled={loading}>
+          <form className="space-y-3" onSubmit={e => { e.preventDefault(); handleLogin(); }}>
+            <input className={inp} type="email" placeholder="Email address" value={form.email} onChange={e => set('email', e.target.value)} required/>
+            <input className={inp} type="password" placeholder="Password" value={form.password} onChange={e => set('password', e.target.value)} required/>
+            <Button type='submit' className="w-full" disabled={loading}>
               {loading ? 'Logging in...' : 'Login to Account'}
             </Button>
             <p className="text-xs text-center text-gray-400">
               Demo admin: <strong>admin@cchumedia.com</strong> / <strong>admin123</strong>
             </p>
-          </div>
+          </form>
         ) : (
-          <div className="space-y-3">
-            <input className={inp} placeholder="Full name *" value={form.name} onChange={e => set('name', e.target.value)} />
-            <input className={inp} type="email" placeholder="Email address *" value={form.email} onChange={e => set('email', e.target.value)} />
-            <input className={inp} type="tel" placeholder="Phone number" value={form.phone} onChange={e => set('phone', e.target.value)} />
-            <input className={inp} type="password" placeholder="Password *" value={form.password} onChange={e => set('password', e.target.value)} />
-            <Button className="w-full" onClick={handleRegister} disabled={loading}>
+          <form className="space-y-3" onSubmit={e => { e.preventDefault(); handleRegister(); }}>
+            <input className={inp} placeholder="Full name *" value={form.name} onChange={e => set('name', e.target.value)} required/>
+            <input className={inp} type="email" placeholder="Email address *" value={form.email} onChange={e => set('email', e.target.value)} required/>
+            <input className={inp} type="tel" placeholder="Phone number" value={form.phone} onChange={e => set('phone', e.target.value)} required/>
+            <input className={inp} type="password" placeholder="Password *" value={form.password} onChange={e => set('password', e.target.value)} required/>
+            <Button type='submit' className="w-full" disabled={loading}>
               {loading ? 'Creating account...' : 'Create Account'}
             </Button>
-          </div>
+          </form>
         )}
 
         <p className="text-xs text-center text-gray-400 mt-4">
