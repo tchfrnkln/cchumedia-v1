@@ -17,7 +17,7 @@ export default function AuthModal() {
 
   const handleLogin = async () => {
     console.log(form.email, form.password);
-    if(form.email === user.email){
+    if(form.email === user?.email){
       showToast(`Welcome back, ${user.email}! 👋`, 'success');
       return closeModal();
     }
