@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 @reference "tailwindcss";
+@plugin "daisyui";
+
 
 
 :root {
@@ -10,6 +12,21 @@
   --brand: #D42B2B;
   --brand-dark: #a81f1f;
   --accent: #7B7EC8;
+  --cchu-red: #C0392B;
+  --cchu-red-dark: #922B21;
+  --cchu-red-light: #F5B7B1;
+  --cchu-red-pale: #FDEDEC;
+  --cchu-black: #1A1A1A;
+  --cchu-dark: #2C2C2C;
+  --cchu-gray: #6B6B6B;
+  --cchu-light: #F7F7F5;
+  --cchu-white: #FFFFFF;
+  --cchu-border: #E8E8E5;
+  --cchu-gold: #D4A843;
+  --cchu-lilac: #9B96C8;
+  --cchu-light-lilac: #DCD8EF;
+  --radius: 12px;
+  --radius-lg: 20px;
 }
 
 * { box-sizing: border-box; }
@@ -20,6 +37,10 @@ html {
 
 body {
   font-family: var(--font-body);
+  /* font-family: 'Montserrat', system-ui, sans-serif; */
+  color: var(--cchu-black);
+  background: var(--cchu-white);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }

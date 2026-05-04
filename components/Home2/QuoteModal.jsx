@@ -11,7 +11,7 @@ export default function QuoteModal() {
   const [sent, setSent] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
+  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all text-white';
 
   const handleSubmit = () => {
     if (!form.name || !form.phone || !form.category) {

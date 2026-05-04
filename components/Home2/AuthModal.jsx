@@ -33,7 +33,7 @@ export default function AuthModal() {
     setLoading(false);
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async () => {    
     setErr(''); setLoading(true);
     
     await signup( form.email, form.password, form.name, "", form.phone, "")
@@ -51,7 +51,7 @@ export default function AuthModal() {
     setLoading(false);
   };
 
-  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
+  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all text-white';
 
   return (
     <Modal type="auth" maxWidth="max-w-md">
@@ -60,7 +60,7 @@ export default function AuthModal() {
         <div className="flex items-center gap-2.5 mb-6">
           <div className="w-10 h-10 bg-brand text-white font-display font-black text-xl rounded-xl flex items-center justify-center">P</div>
           <div>
-            <div className="font-display font-black text-base">PrintHub</div>
+            <div className="font-display font-black text-white">PrintHub</div>
             <div className="text-xs text-gray-400">by C-Chu Media Ltd</div>
           </div>
         </div>

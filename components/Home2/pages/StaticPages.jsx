@@ -3,6 +3,8 @@ import { useStore } from '../../../lib/store';
 import { CONFIG, CATEGORIES, PRODUCTS, formatNaira } from '../../../lib/data';
 import Button from '../ui/Button';
 import ProductCard from '../ui/ProductCard';
+import { useAuthStore } from '@/store/authStore';
+import { useProfileStore } from '@/store/profileStore';
 
 export function WishlistPage() {
   const { wishlist, navigate } = useStore();
@@ -156,7 +158,12 @@ export function StarterKitsPage() {
 }
 
 export function EarnPage() {
-  const { user, openModal } = useStore();
+  const { openModal } = useStore();
+  const { user } = useAuthStore()
+  const { profile, fetchProfile } = useProfileStore();
+
+  const affLink = `${window.location.origin}/auth/new?aff=${profile?.affiliate_id}`;
+  
   return (
     <div className="max-w-3xl mx-auto px-6 py-10 animate-fade-in">
       <div className="text-center mb-8">
@@ -181,12 +188,22 @@ export function EarnPage() {
       ) : (
         <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 text-center border border-gray-100 dark:border-gray-800">
           <div className="font-bold text-sm mb-2">Your Referral Link</div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl px-4 py-3 text-sm font-mono text-brand border border-gray-200 dark:border-gray-700 mb-3">
-            https://printhub.ng/ref/{user.id.slice(0,8)}
-          </div>
-          <Button size="sm" onClick={() => { navigator.clipboard?.writeText(`https://printhub.ng/ref/${user.id.slice(0,8)}`); useStore.getState().showToast('Link copied!','success'); }}>
-            Copy Link
-          </Button>
+          {profile?.affiliate_id ? 
+          <div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl px-4 py-3 text-sm font-mono text-brand border border-gray-200 dark:border-gray-700 mb-3">
+              {affLink}
+            </div>
+            <Button size="sm" onClick={() => { navigator.clipboard?.writeText(affLink); useStore.getState().showToast('Link copied!','success'); }}>
+              Copy Link
+            </Button>
+          </div>:
+            <Button size="sm" onClick={() => { 
+                fetchProfile();
+                useStore.getState().showToast('Fetching Link',); 
+              }}>
+              Get Link
+            </Button>
+          }
         </div>
       )}
     </div>

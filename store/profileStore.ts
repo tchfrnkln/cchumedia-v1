@@ -46,6 +46,8 @@ export const useProfileStore = create<ProfileState>()(
 
           if (error || !data) throw error || new Error('Profile not found');
 
+          const affiliate_id = data.id;
+
           const affiliate_link = `${window.location.origin}/auth/new?aff=${data.id}`;
 
           const earnings = await get().calculateEarnings();
@@ -53,6 +55,7 @@ export const useProfileStore = create<ProfileState>()(
           set({
             profile: {
               ...data,
+              affiliate_id,
               affiliate_link,
               total_earnings: earnings,
             },

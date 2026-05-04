@@ -4,6 +4,7 @@ import { Search, Heart, User, ShoppingBag, MessageCircle, Sun, Moon, ChevronDown
 import { useStore } from '../../lib/store';
 import { CATEGORIES, CONFIG, PRODUCTS } from '../../lib/data';
 import Button from './ui/Button';
+import { useAuthStore } from '@/store/authStore';
 
 export default function Header() {
   const { route, user, cart, theme, setTheme, navigate, openModal } = useStore();
@@ -38,6 +39,8 @@ export default function Header() {
     { page: 'faq', label: '❓ FAQ' },
     { page: 'contact', label: '📞 Contact' }
   ];
+
+  const { logout } = useAuthStore();
 
   return (
     <>
@@ -128,8 +131,9 @@ export default function Header() {
               <div className='flex items-center gap-1'>
                 {/* Theme toggle */}
                 <button
-                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                  className="hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  // onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                  onClick={() => logout()}
+                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   title="Toggle theme"
                 >
                   {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}

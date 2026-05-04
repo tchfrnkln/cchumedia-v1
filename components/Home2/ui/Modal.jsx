@@ -7,7 +7,7 @@ export default function Modal({ type, title, children, maxWidth = 'max-w-lg' }) 
   const { modal, closeModal } = useStore();
   if (!modal || modal.type !== type) return null;
   return (
-    <div className="modal-backdrop animate-fade-in" onClick={e => e.target === e.currentTarget && closeModal()}>
+    <div className="modal-backdrop animate-fade-in text-white" onClick={e => e.target === e.currentTarget && closeModal()}>
       <div className={`relative w-full ${maxWidth} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-fade-in`}>
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
