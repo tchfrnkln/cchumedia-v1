@@ -1,9 +1,18 @@
 'use client';
 import { useStore } from '../../../lib/store';
 import { CATEGORIES } from '../../../lib/data';
+import { useProductStore } from '@/store/productStore';
 
 export default function CategorySidebar({ activeCat = 'all' }) {
   const { navigate } = useStore();
+
+  const { products: storeProducts, categoryCounts } = useProductStore();
+
+  const getCount = (catId) => {
+    if (catId === 'all') return storeProducts?.length || 0;
+    return categoryCounts[catId] || 0;
+  };
+
   return (
     <aside className="hidden lg:block w-56 shrink-0">
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden sticky top-24">
@@ -22,7 +31,7 @@ export default function CategorySidebar({ activeCat = 'all' }) {
             >
               <span className="text-base">{cat.icon}</span>
               <span className="flex-1 leading-tight">{cat.label}</span>
-              <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeCat === cat.id ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>{cat.count}</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeCat === cat.id ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>{getCount(cat.id)}</span>
             </button>
           ))}
         </div>

@@ -20,6 +20,7 @@ import {
   CampaignMaterialsPage
 } from './pages/StaticPages';
 import { BookPublishingPage } from './ui/CategoryShop';
+import { useProductStore } from '@/store/productStore';
 
 function Router() {
   const page = useStore(s => s.route.page);
@@ -45,6 +46,7 @@ function Router() {
 
 export default function App() {
   const { init, route } = useStore();
+  const {product, fetchProducts} = useProductStore();
 
   useEffect(() => {
     init();
@@ -57,8 +59,9 @@ export default function App() {
       useStore.setState({ route: { page: page || 'home', params } });
     };
     window.addEventListener('popstate', onPop);
+    fetchProducts()
     return () => window.removeEventListener('popstate', onPop);
-  }, [init]);
+  }, [fetchProducts, init]);
 
   const isAdmin = route.page === 'admin';
   const isDesignTool = route.page === 'design-tool';

@@ -18,8 +18,11 @@ interface ProductState {
   products: Product[];
   isLoading: boolean;
   error: string | null;
+  categoryCounts: Record<string, number>;
+
 
   fetchProducts: () => Promise<void>;
+  getCategoryCounts: () => Record<string, number>;
   addProduct: (
     name: string,
     description: string,
@@ -44,6 +47,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
   isLoading: false,
   error: null,
+  categoryCounts: {},
 
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
@@ -57,9 +61,21 @@ export const useProductStore = create<ProductState>((set, get) => ({
       toast.error(error.message);
       return;
     }
-
     set({ products: data as Product[], isLoading: false });
+    
+    const counts: Record<string, number> = { all: data.length };
+
+      data.forEach(product => {
+        const cat = product.cat || product.category;
+        if (cat) {
+          counts[cat] = (counts[cat] || 0) + 1;
+        }
+      });
+
+    set({ categoryCounts: counts });
   },
+  getCategoryCounts: () => get().categoryCounts,
+
 
   addProduct: async (name, description, price, order, image, specs) => {
     set({ isLoading: true, error: null });

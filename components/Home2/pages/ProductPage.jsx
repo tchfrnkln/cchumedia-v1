@@ -7,6 +7,8 @@ import ProductCard from '../ui/ProductCard';
 import Badge from '../ui/Badge';
 import StarRating from '../ui/StarRating';
 import Button from '../ui/Button';
+import { useProductStore } from '@/store/productStore';
+import Image from 'next/image';
 
 const SIZES = ['A5', 'A4', 'A3', 'A2', 'A1', 'Custom'];
 const MATERIALS = ['Standard', 'Premium', 'Luxury'];
@@ -15,10 +17,13 @@ const TURNAROUNDS = ['Standard (5-7 days)', 'Express (3 days)', 'Rush (24hrs)'];
 
 const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury', Sale:'sale', Popular:'accent', New:'green' }[b] || 'brand');
 
-  const Chip = ({ options, field, config }) => (
+  const Chip = ({ options, field, config, setConfig }) => (
     <div className="flex flex-wrap gap-2">
       {options.map(opt => (
-        <button key={opt} onClick={() => setC(field, opt)}
+        <button key={opt} onClick={() => {
+          const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
+          setC(field, opt)
+        }}
           className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${config[field] === opt ? 'bg-brand text-white border-brand' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand'}`}>
           {opt}
         </button>
@@ -28,7 +33,10 @@ const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury'
 
 export default function ProductPage() {
   const { route, navigate, addToCart, toggleWishlist, wishlist, showToast, openModal } = useStore();
-  const product = PRODUCTS.find(p => p.id === route.params?.id);
+  const {products} = useProductStore();
+  var product = PRODUCTS.find(p => p.id === route.params?.id);
+
+  if (!product) product = products.find(p => p.id === route.params?.id);
 
   const [config, setConfig] = useState({ size: 'A4', material: 'Standard', finishing: 'None', turnaround: 'Standard (5-7 days)' });
   const [qty, setQty] = useState(1);
@@ -44,11 +52,11 @@ export default function ProductPage() {
 
   const cat = CATEGORIES.find(c => c.id === product.cat);
   const related = PRODUCTS.filter(p => p.cat === product.cat && p.id !== product.id).slice(0, 4);
-  const { unit, total, discount } = calcProductPrice(product.basePrice, config.size, config.material, config.finishing, config.turnaround, qty);
+  const { unit, total, discount } = calcProductPrice(product.basePrice, config.size, config.material, config.finishing, config.turnaround, qty, product.price);
   const isWished = wishlist.includes(product.id);
   const discount2 = product.origPrice ? Math.round((1 - product.basePrice / product.origPrice) * 100) : null;
 
-  const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
+  // const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
 
   const handleAddToCart = () => {
     addToCart(product, config, qty);
@@ -76,7 +84,7 @@ export default function ProductPage() {
           {/* Left: Image & trust */}
           <div>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl h-72 flex items-center justify-center text-[120px] mb-4 relative">
-              {product.icon}
+              {product.icon ? product.icon: <Image src={product?.image_url} alt={product?.name} width={200} height={200} className="w-full h-full object-contain" />}
               <button
                 onClick={() => toggleWishlist(product.id)}
                 className="absolute top-4 right-4 p-3 bg-white dark:bg-gray-900 rounded-xl shadow-md hover:scale-110 transition-transform"
@@ -85,13 +93,18 @@ export default function ProductPage() {
               </button>
             </div>
             {/* Thumbs */}
-            <div className="flex gap-2 mb-6">
+            {product.icon ? <div className="flex gap-2 mb-6">
               {[product.icon, product.icon, product.icon].map((ic, i) => (
                 <div key={i} className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl cursor-pointer border-2 transition-all ${i === 0 ? 'border-brand bg-red-50 dark:bg-red-950' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:border-brand'}`}>
                   {ic}
                 </div>
               ))}
-            </div>
+            </div>:
+            <div className="flex gap-2 mb-6">
+              {[product.image_url, product.image_url, product.image_url].map((ic, i) => (
+                <Image src={ic} alt={product.name}  key={i} className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl cursor-pointer border-2 transition-all object-contain`} width={64} height={64}/>
+              ))}
+            </div>}
 
             {/* Trust badges */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
@@ -124,10 +137,12 @@ export default function ProductPage() {
             <StarRating rating={product.rating} reviews={product.reviews} size="md" />
 
             <div className="flex items-baseline gap-3 my-4">
-              <span className="font-display font-black text-3xl text-brand">{formatNaira(product.basePrice)}</span>
-              {product.origPrice && (
+              <span className="font-display font-black text-3xl text-brand">{product.basePrice ?formatNaira(product.basePrice): formatNaira(product.price)}</span>
+              {product.origPrice ? (
                 <span className="text-gray-400 line-through text-lg">{formatNaira(product.origPrice)}</span>
-              )}
+              ):
+                <span className="text-gray-400 line-through text-lg">{formatNaira(product.price + (product.price * 0.25))}</span>
+              }
               <span className="text-gray-400 text-sm">from (per unit/piece)</span>
             </div>
 
@@ -139,19 +154,19 @@ export default function ProductPage() {
 
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Size</label>
-                <Chip options={SIZES} field="size" config={config} />
+                <Chip options={SIZES} field="size" config={config} setConfig={setConfig} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Material Quality</label>
-                <Chip options={MATERIALS} field="material" config={config} />
+                <Chip options={MATERIALS} field="material" config={config} setConfig={setConfig} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Finishing</label>
-                <Chip options={FINISHINGS} field="finishing" config={config} />
+                <Chip options={FINISHINGS} field="finishing" config={config} setConfig={setConfig} />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Turnaround</label>
-                <Chip options={TURNAROUNDS} field="turnaround" config={config} />
+                <Chip options={TURNAROUNDS} field="turnaround" config={config} setConfig={setConfig} />
               </div>
 
               <div>

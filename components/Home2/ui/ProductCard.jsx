@@ -4,6 +4,7 @@ import { useStore } from '../../../lib/store';
 import { formatNaira } from '../../../lib/data';
 import Badge from './Badge';
 import StarRating from './StarRating';
+import Image from 'next/image';
 
 const badgeVariant = (badge) => {
   const map = { Bestseller: 'brand', Premium: 'dark', Luxury: 'luxury', Sale: 'sale', Popular: 'accent', New: 'green' };
@@ -22,9 +23,11 @@ export default function ProductCard({ product }) {
       {/* Image area */}
       <div
         className="relative h-44 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center text-6xl cursor-pointer"
-        onClick={() => navigate('product', { id: product.id })}
+        onClick={() => navigate('product', { id: product?.id })}
       >
-        {product.icon}
+        {product?.icon ? product.icon : 
+          <Image src={product?.image_url} alt={product?.name} width={200} height={200} className="w-full h-full object-contain" />
+        }
         {/* Hover actions */}
         <div className="product-card-actions absolute inset-0 flex items-center justify-center gap-2 bg-black/10">
           <button
@@ -67,10 +70,12 @@ export default function ProductCard({ product }) {
         </h3>
         <StarRating rating={product.rating} reviews={product.reviews} />
         <div className="flex items-baseline gap-2 mt-2">
-          <span className="font-display font-black text-brand text-lg">{formatNaira(product.basePrice)}</span>
-          {product.origPrice && (
+          <span className="font-display font-black text-brand text-lg">{product.basePrice ? formatNaira(product.basePrice): formatNaira(product.price)}</span>
+          {product.origPrice ? (
             <span className="text-xs text-gray-400 line-through">{formatNaira(product.origPrice)}</span>
-          )}
+          ) : 
+            <span className="text-xs text-gray-400 line-through">{formatNaira(product.price + (product.price * 0.25))}</span>
+          }
         </div>
         <button
           className="mt-3 w-full py-2 bg-brand text-white text-xs font-display font-bold rounded-lg hover:bg-brand-dark transition-colors"

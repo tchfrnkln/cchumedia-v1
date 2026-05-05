@@ -6,6 +6,7 @@ import ProductCard from '../ui/ProductCard';
 import Button from '../ui/Button';
 import CategorySidebar from '../ui/CategorySidebar';
 import StoreMain, { StoreExtras } from '../ui/CategoryShop';
+import { useProductStore } from '@/store/productStore';
 
 function FlashTimer() {
   const [time, setTime] = useState({ h: 8, m: 24, s: 0 });
@@ -52,9 +53,14 @@ function TestimonialCard({ name, role, text, rating }) {
 }
 
 export default function HomePage() {
+  const { products } = useProductStore();
   const { navigate, openModal } = useStore();
-  const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
-  const bestsellers = [...PRODUCTS].sort((a, b) => b.reviews - a.reviews).slice(0, 8);
+  // const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
+  const featured = products?.filter(p => p.featured).slice(0, 8);
+  const bestsellers = [...products].sort((a, b) => b.reviews - a.reviews).slice(0, 8);
+
+  console.log("Products", products);
+  
 
   const testimonials = [
     { name: 'Amaka Obi', role: 'Event Planner, Abuja', rating: 5, text: 'PrintHub delivered our conference materials in record time. Quality was excellent and pricing very fair.' },
