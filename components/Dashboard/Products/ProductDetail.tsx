@@ -37,14 +37,6 @@ export default function ProductDetailPage() {
   const minQty = product?.order ?? 1;
   const quantity = getQuantity(productId, minQty);
 
-  /**
-   * Extract percentage (used in store too — could be moved inside store if preferred)
-   */
-  // const extractPercentage = (value: string) => {
-  //   const match = value.match(/([+-]\d+)%/);
-  //   return match ? Number(match[1]) : 0;
-  // };
-
   const cleanLabel = (value: string) => {
     return value.replace(/([+-]\d+)%/, '').trim();
   };

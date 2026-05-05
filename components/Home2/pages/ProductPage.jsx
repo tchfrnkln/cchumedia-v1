@@ -10,11 +10,6 @@ import Button from '../ui/Button';
 import { useProductStore } from '@/store/productStore';
 import Image from 'next/image';
 
-const SIZES = ['A5', 'A4', 'A3', 'A2', 'A1', 'Custom'];
-const MATERIALS = ['Standard', 'Premium', 'Luxury'];
-const FINISHINGS = ['None', 'Gloss Lamination', 'Matte Lamination', 'Spot UV'];
-const TURNAROUNDS = ['Standard (5-7 days)', 'Express (3 days)', 'Rush (24hrs)'];
-
 const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury', Sale:'sale', Popular:'accent', New:'green' }[b] || 'brand');
 
   const Chip = ({ options, field, config, setConfig }) => (
@@ -50,8 +45,13 @@ export default function ProductPage() {
     </div>
   );
 
+  const spec = product.specs ? product.specs : null;
+
+  console.log("Spec", spec);
+  
+
   const cat = CATEGORIES.find(c => c.id === product.cat);
-  const related = PRODUCTS.filter(p => p.cat === product.cat && p.id !== product.id).slice(0, 4);
+  const related = products.filter(p => p.cat === product.cat && p.id !== product.id).slice(0, 4);
   const { unit, total, discount } = calcProductPrice(product.basePrice, config.size, config.material, config.finishing, config.turnaround, qty, product.price);
   const isWished = wishlist.includes(product.id);
   const discount2 = product.origPrice ? Math.round((1 - product.basePrice / product.origPrice) * 100) : null;
@@ -151,24 +151,16 @@ export default function ProductPage() {
             {/* Configurator */}
             <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 space-y-4 mb-6 border border-gray-100 dark:border-gray-800">
               <h3 className="font-display font-black text-sm uppercase tracking-wider text-gray-500">Configure Your Order</h3>
-
-              <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Size</label>
-                <Chip options={SIZES} field="size" config={config} setConfig={setConfig} />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Material Quality</label>
-                <Chip options={MATERIALS} field="material" config={config} setConfig={setConfig} />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Finishing</label>
-                <Chip options={FINISHINGS} field="finishing" config={config} setConfig={setConfig} />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Turnaround</label>
-                <Chip options={TURNAROUNDS} field="turnaround" config={config} setConfig={setConfig} />
-              </div>
-
+              {
+                spec && Object.entries(spec).map(([key, options]) => (
+                  <div key={key}>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">
+                      {key}
+                    </label>
+                    <Chip options={options} field={key} config={config} setConfig={setConfig} />
+                  </div>
+                ))
+              }
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Quantity</label>
                 <div className="flex items-center gap-3">
