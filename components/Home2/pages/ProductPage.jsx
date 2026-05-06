@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Heart, ShoppingCart, MessageCircle, Share2, Check } from 'lucide-react';
 import { useStore } from '../../../lib/store';
 import { PRODUCTS, CATEGORIES, CONFIG, formatNaira, calcProductPrice } from '../../../lib/data';
@@ -9,33 +9,78 @@ import StarRating from '../ui/StarRating';
 import Button from '../ui/Button';
 import { useProductStore } from '@/store/productStore';
 import Image from 'next/image';
+import { useProductDetailStore } from '@/store/productDetailStore';
 
 const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury', Sale:'sale', Popular:'accent', New:'green' }[b] || 'brand');
 
-  const Chip = ({ options, field, config, setConfig }) => (
+  const cleanLabel = (value) => {
+    return value.replace(/([+-]\d+)%/, '').trim();
+  };
+
+  const Chip = ({ options, field, config, setConfig, setSpec, productId }) =>{
+    return (
     <div className="flex flex-wrap gap-2">
       {options.map(opt => (
         <button key={opt} onClick={() => {
           const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
           setC(field, opt)
+          setSpec(productId, field, opt)
         }}
           className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${config[field] === opt ? 'bg-brand text-white border-brand' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-brand hover:text-brand'}`}>
-          {opt}
+          {cleanLabel(opt)}
         </button>
       ))}
     </div>
-  );
+  )}
 
 export default function ProductPage() {
   const { route, navigate, addToCart, toggleWishlist, wishlist, showToast, openModal } = useStore();
   const {products} = useProductStore();
-  var product = PRODUCTS.find(p => p.id === route.params?.id);
+  const productId = route.params?.id;
+  var product = PRODUCTS.find(p => p.id === productId);
 
-  if (!product) product = products.find(p => p.id === route.params?.id);
+  if (!product) product = products.find(p => p.id === productId);
 
   const [config, setConfig] = useState({ size: 'A4', material: 'Standard', finishing: 'None', turnaround: 'Standard (5-7 days)' });
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+
+  const {
+      setQuantity,
+      getQuantity,
+      setDefaultSpecs,
+      setSpec,
+      getSpec,
+      getUnitPrice,
+      getTotalPrice,
+    } = useProductDetailStore();
+  
+    // const { openPopover } = useDesignPopoverStore();
+  
+    const minQty = product?.order ?? 1;
+    const quantity = getQuantity(productId, minQty);
+  
+    useEffect(() => {
+      if (product && product.specs) {
+        const defaults = {};
+        Object.entries(product.specs).forEach(([key, options]) => {
+          defaults[key] = options[0];
+        });
+        setDefaultSpecs(product.id, defaults);
+        setConfig(defaults)
+      }
+    }, [product, setDefaultSpecs]);
+
+
+    const handleQuantityChange = (newQty) => {
+      if (newQty >= minQty) {
+        setQuantity(productId, newQty);
+      }
+    };
+
+    const unitPrice = getUnitPrice(productId, product);
+    const totalPrice = getTotalPrice(productId, product, minQty);
+
 
   if (!product) return (
     <div className="max-w-[1380px] mx-auto px-6 py-20 text-center">
@@ -47,9 +92,6 @@ export default function ProductPage() {
 
   const spec = product.specs ? product.specs : null;
 
-  console.log("Spec", spec);
-  
-
   const cat = CATEGORIES.find(c => c.id === product.cat);
   const related = products.filter(p => p.cat === product.cat && p.id !== product.id).slice(0, 4);
   const { unit, total, discount } = calcProductPrice(product.basePrice, config.size, config.material, config.finishing, config.turnaround, qty, product.price);
@@ -59,7 +101,8 @@ export default function ProductPage() {
   // const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
 
   const handleAddToCart = () => {
-    addToCart(product, config, qty);
+    // console.log(product, config, quantity);
+    addToCart(product, config, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -141,7 +184,7 @@ export default function ProductPage() {
               {product.origPrice ? (
                 <span className="text-gray-400 line-through text-lg">{formatNaira(product.origPrice)}</span>
               ):
-                <span className="text-gray-400 line-through text-lg">{formatNaira(product.price + (product.price * 0.25))}</span>
+                <span className="text-gray-400 line-through text-lg">{formatNaira(unitPrice + (unitPrice * 0.25))}</span>
               }
               <span className="text-gray-400 text-sm">from (per unit/piece)</span>
             </div>
@@ -157,7 +200,7 @@ export default function ProductPage() {
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">
                       {key}
                     </label>
-                    <Chip options={options} field={key} config={config} setConfig={setConfig} />
+                    <Chip options={options} field={key} config={config} setConfig={setConfig} setSpec={setSpec} productId={product.id} />
                   </div>
                 ))
               }
@@ -165,9 +208,15 @@ export default function ProductPage() {
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Quantity</label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                    <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2.5 text-lg font-bold hover:text-brand transition-colors">−</button>
-                    <span className="px-4 font-bold text-sm">{qty}</span>
-                    <button onClick={() => setQty(qty + 1)} className="px-4 py-2.5 text-lg font-bold hover:text-brand transition-colors">+</button>
+                    <button onClick={() => {
+                      setQty(Math.max(1, qty - 1))
+                      handleQuantityChange(quantity - 1)
+                      }} className="px-4 py-2.5 text-lg font-bold hover:text-brand transition-colors" disabled={quantity < minQty}>−</button>
+                    <span className="px-4 font-bold text-sm">{quantity}</span>
+                    <button onClick={() => {
+                      setQty(qty + 1)
+                      handleQuantityChange(quantity + 1)
+                      }} className="px-4 py-2.5 text-lg font-bold hover:text-brand transition-colors">+</button>
                   </div>
                   {qty >= 50 && (
                     <span className="text-xs text-green-600 font-bold bg-green-50 dark:bg-green-950 px-2 py-1 rounded-lg">
@@ -181,7 +230,7 @@ export default function ProductPage() {
               <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-500">Unit price:</span>
-                  <span className="font-bold">{formatNaira(unit)}</span>
+                  <span className="font-bold">{formatNaira(unitPrice)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm mb-1">
@@ -191,7 +240,7 @@ export default function ProductPage() {
                 )}
                 <div className="flex justify-between text-lg">
                   <span className="font-display font-black">Total ({qty} pcs):</span>
-                  <span className="font-display font-black text-brand">{formatNaira(total)}</span>
+                  <span className="font-display font-black text-brand">{formatNaira(totalPrice)}</span>
                 </div>
               </div>
             </div>
@@ -201,7 +250,7 @@ export default function ProductPage() {
               <Button className="flex-1" onClick={handleAddToCart}>
                 {added ? <><Check size={16} /> Added!</> : <><ShoppingCart size={16} /> Add to Cart</>}
               </Button>
-              <Button variant="wa" href={CONFIG.wa(`Hi! I want to order: ${product.name} (${qty} pcs)`)} target="_blank">
+              <Button variant="wa" href={CONFIG.wa(`Hi! I want to order: ${product.name} (${quantity} pcs)`)} target="_blank">
                 <MessageCircle size={16} />
               </Button>
               <button
@@ -213,7 +262,7 @@ export default function ProductPage() {
             </div>
 
             <button
-              onClick={() => { addToCart(product, config, qty); navigate('checkout'); }}
+              onClick={() => { addToCart(product, config, quantity); navigate('checkout'); }}
               className="w-full py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-display font-black rounded-xl hover:opacity-90 transition-opacity"
             >
               Buy Now →

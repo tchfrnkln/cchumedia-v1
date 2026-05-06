@@ -73,13 +73,8 @@ export default function ProductDetailPage() {
     }
   };
 
-  // ────────────────────────────────────────────────
-  // Prices are now computed fresh on every render
-  // No useEffect → instant reaction to spec/quantity changes
-  // ────────────────────────────────────────────────
   const unitPrice = getUnitPrice(productId, product);
   const totalPrice = getTotalPrice(productId, product, minQty);
-
   return (
     <div className="w-full">
       {/* Top Navigation */}
