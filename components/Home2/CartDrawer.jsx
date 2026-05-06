@@ -4,12 +4,17 @@ import { useStore } from '../../lib/store';
 import { formatNaira } from '../../lib/data';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
+import Image from 'next/image';
 
 export default function CartDrawer() {
   const { cart, removeFromCart, updateCartQty, getCartTotal, navigate, closeModal, modal } = useStore();
   if (!modal || modal.type !== 'cart') return null;
 
   const total = getCartTotal();
+  
+  const cleanLabel = (value) => {
+    return value.replace(/([+-]\d+)%/, '').trim();
+  };
 
   return (
     <div className="fixed inset-0 z-[400] flex justify-end">
@@ -42,24 +47,25 @@ export default function CartDrawer() {
             <div className="p-4 space-y-3">
               {cart.map(item => (
                 <div key={item.cartId} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-                  <div className="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                    {item.icon}
-                  </div>
+                  <Image className="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-2xl shrink-0" src={item.image} alt={item.name} width={56} height={56} />
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sm leading-tight line-clamp-2">{item.name}</p>
                     {item.config?.size && <p className="text-xs text-gray-400 mt-0.5">{item.config.size} · {item.config.material}</p>}
+                    {Object.entries(item.config).map(([key, option]) => (
+                      <p key={key} className="text-xs text-gray-400 mt-0.5">{key} · {cleanLabel(option)}</p>
+                    ))}
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                         <button
                           onClick={() => updateCartQty(item.cartId, item.qty - 1)}
-                          className="p-1.5 hover:text-brand transition-colors"
+                          className="hidden p-1.5 hover:text-brand transition-colors"
                         >
                           <Minus size={12} />
                         </button>
                         <span className="px-2 text-sm font-bold">{item.qty}</span>
                         <button
                           onClick={() => updateCartQty(item.cartId, item.qty + 1)}
-                          className="p-1.5 hover:text-brand transition-colors"
+                          className="hidden p-1.5 hover:text-brand transition-colors"
                         >
                           <Plus size={12} />
                         </button>

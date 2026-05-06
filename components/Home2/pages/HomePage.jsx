@@ -58,9 +58,7 @@ export default function HomePage() {
   // const featured = PRODUCTS.filter(p => p.featured).slice(0, 8);
   const featured = products?.filter(p => p.featured).slice(0, 8);
   const bestsellers = [...products].sort((a, b) => b.reviews - a.reviews).slice(0, 8);
-
-  console.log("Products", products[0]?.specs);
-  
+ 
 
   const testimonials = [
     { name: 'Amaka Obi', role: 'Event Planner, Abuja', rating: 5, text: 'PrintHub delivered our conference materials in record time. Quality was excellent and pricing very fair.' },

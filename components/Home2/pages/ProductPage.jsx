@@ -102,7 +102,7 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     // console.log(product, config, quantity);
-    addToCart(product, config, quantity);
+    addToCart(product, config, quantity, totalPrice);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -262,7 +262,7 @@ export default function ProductPage() {
             </div>
 
             <button
-              onClick={() => { addToCart(product, config, quantity); navigate('checkout'); }}
+              onClick={() => { addToCart(product, config, quantity, totalPrice); navigate('checkout'); }}
               className="w-full py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-display font-black rounded-xl hover:opacity-90 transition-opacity"
             >
               Buy Now →
