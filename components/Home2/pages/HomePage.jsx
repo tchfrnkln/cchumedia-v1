@@ -183,7 +183,7 @@ export default function HomePage() {
             <StoreMain/>
 
             {/* Featured */}
-            <section className="mb-14">
+            <section className="my-14">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="font-display font-black text-2xl">Featured Products</h2>

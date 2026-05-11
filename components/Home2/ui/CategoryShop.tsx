@@ -167,10 +167,10 @@ export default function StoreMain() {
   const visibleCategories = CATEGORIES.filter((c) => c.id !== "all");
 
   return (
-    <main className="w-full min-h-screen text-black dark:text-white  space-y-8 sm:space-y-10">
+    <main className="w-full text-black dark:text-white  space-y-8 sm:space-y-10">
 
       {/* ── PROMO BANNERS ── */}
-      <section aria-label="Promotional banners">
+      <section aria-label="Promotional banners my-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <PromoBanner
             emoji="🏷️"
