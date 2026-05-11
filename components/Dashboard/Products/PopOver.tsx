@@ -1,5 +1,6 @@
 'use client';
 
+import { useStore } from '@/lib/store';
 import { useCartStore } from '@/store/cartStore';
 import { useDesignPopoverStore } from '@/store/popOver';
 import { useProductDetailStore } from '@/store/productDetailStore';
@@ -10,7 +11,8 @@ import {
   X,
   ImageIcon,
   Building2,
-  ArrowLeft
+  ArrowLeft,
+  Plus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -19,6 +21,7 @@ interface Props {
 }
 
 export default function DesignPopover({ id }: Props) {
+  const { addToCartFront } = useStore();
   const { products } = useProductStore();
   const {
     isOpen,
@@ -106,6 +109,11 @@ export default function DesignPopover({ id }: Props) {
 
     const finalUnitPrice = getUnitPrice(id, product);
 
+    console.log(`From Pop Over Product ${product}, ${specs}, ${quantity}, ${finalUnitPrice * quantity}`);
+
+    addToCartFront(product, specs, quantity, (finalUnitPrice * quantity))
+    
+
     addToCart(
       product.id,
       product.name,
@@ -115,7 +123,7 @@ export default function DesignPopover({ id }: Props) {
       designDetails
     );
 
-    toast.success(`Added ${quantity} × ${product.name} to cart`);
+    // toast.success(`Added ${quantity} × ${product.name} to cart`);
 
     clearQuantity(id);
     clearSpecs(id);
@@ -159,6 +167,14 @@ export default function DesignPopover({ id }: Props) {
               <p className="text-sm opacity-70">
                 Choose how you want to provide your design
               </p>
+
+              <button
+                className="btn btn-outline w-full justify-start gap-3"
+                onClick={() => {
+                  window.open('https://cchumedia-v2.vercel.app/#design-tool', '_blank');
+                }}>
+                <Plus size={18} /> Create My Design
+              </button>
 
               <button
                 className="btn btn-outline w-full justify-start gap-3"

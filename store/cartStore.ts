@@ -94,7 +94,7 @@ export const useCartStore = create<CartState>()(
           items: [...get().items, newItem]
         })
 
-        toast.success('Added to cart!')
+        // toast.success('Added to cart!')
       },
 
       /* ---------- REMOVE ITEM ---------- */

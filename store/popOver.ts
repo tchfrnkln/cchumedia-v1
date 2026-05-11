@@ -88,7 +88,7 @@ export const useDesignPopoverStore = create<DesignPopoverState>((set) => ({
     //   if (error) throw error;
 
       set({ designFileUrl: data.publicUrl });
-      toast.success('Design file uploaded!');
+      // toast.success('Design file uploaded!');
     } catch (err: unknown) {
       toast.error(`Upload failed: ${ (err as Error).message }`);
     }

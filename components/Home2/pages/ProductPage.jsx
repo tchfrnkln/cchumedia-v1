@@ -10,6 +10,8 @@ import Button from '../ui/Button';
 import { useProductStore } from '@/store/productStore';
 import Image from 'next/image';
 import { useProductDetailStore } from '@/store/productDetailStore';
+import DesignPopover from '@/components/Dashboard/Products/PopOver';
+import { useDesignPopoverStore } from '@/store/popOver';
 
 const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury', Sale:'sale', Popular:'accent', New:'green' }[b] || 'brand');
 
@@ -34,7 +36,7 @@ const badgeVariant = b => ({ Bestseller:'brand', Premium:'dark', Luxury:'luxury'
   )}
 
 export default function ProductPage() {
-  const { route, navigate, addToCart, toggleWishlist, wishlist, showToast, openModal } = useStore();
+  const { route, navigate, addToCartFront, toggleWishlist, wishlist, showToast, openModal } = useStore();
   const {products} = useProductStore();
   const productId = route.params?.id;
   var product = PRODUCTS.find(p => p.id === productId);
@@ -55,7 +57,7 @@ export default function ProductPage() {
       getTotalPrice,
     } = useProductDetailStore();
   
-    // const { openPopover } = useDesignPopoverStore();
+    const { openPopover } = useDesignPopoverStore();
   
     const minQty = product?.order ?? 1;
     const quantity = getQuantity(productId, minQty);
@@ -101,8 +103,8 @@ export default function ProductPage() {
   // const setC = (k, v) => setConfig(prev => ({ ...prev, [k]: v }));
 
   const handleAddToCart = () => {
-    // console.log(product, config, quantity);
-    addToCart(product, config, quantity, totalPrice);
+    return openPopover();
+    addToCartFront(product, config, quantity, totalPrice);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -262,7 +264,7 @@ export default function ProductPage() {
             </div>
 
             <button
-              onClick={() => { addToCart(product, config, quantity, totalPrice); navigate('checkout'); }}
+              onClick={() => { addToCartFront(product, config, quantity, totalPrice); navigate('checkout'); }}
               className="w-full py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-display font-black rounded-xl hover:opacity-90 transition-opacity"
             >
               Buy Now →
@@ -280,6 +282,7 @@ export default function ProductPage() {
           </section>
         )}
       </div>
+      <DesignPopover id={productId} />
     </div>
   );
 }
