@@ -93,9 +93,6 @@ export default function CheckoutPage() {
   };
 
   const handleBankTransferConfirm = async () => {
-    return console.log("cart", cart);
-    
-
     if (!receiptFile) {
       showToast('Please upload payment receipt', 'error');
       return;

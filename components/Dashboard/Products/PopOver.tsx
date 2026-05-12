@@ -111,7 +111,7 @@ export default function DesignPopover({ id }: Props) {
 
     console.log(`From Pop Over Product ${product}, ${specs}, ${quantity}, ${finalUnitPrice * quantity}`);
 
-    addToCartFront(product, specs, quantity, (finalUnitPrice * quantity))
+    addToCartFront(product, specs, quantity, (finalUnitPrice * quantity), designDetails)
     
 
     addToCart(

@@ -38,7 +38,7 @@ export default function ProductCard({ product }) {
             <Eye size={16} />
           </button>
           <button
-            className="p-2.5 bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:bg-brand hover:text-white transition-colors"
+            className="p-2.5 bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:bg-brand hover:text-white transition-colors hidden"
             onClick={e => { 
               e.stopPropagation(); 
               const defautSpecs = Object.fromEntries(

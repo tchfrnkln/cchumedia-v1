@@ -104,9 +104,9 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     return openPopover();
-    addToCartFront(product, config, quantity, totalPrice);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    // addToCartFront(product, config, quantity, totalPrice);
+    // setAdded(true);
+    // setTimeout(() => setAdded(false), 2000);
   };
 
   return (
@@ -264,7 +264,7 @@ export default function ProductPage() {
             </div>
 
             <button
-              onClick={() => { addToCartFront(product, config, quantity, totalPrice); navigate('checkout'); }}
+              onClick={() => { openPopover(); }}
               className="w-full py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-display font-black rounded-xl hover:opacity-90 transition-opacity"
             >
               Buy Now →
