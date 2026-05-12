@@ -22,7 +22,7 @@ import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 
 // Dynamic Paystack
-const PaystackButton = dynamic(
+export const PaystackButton = dynamic(
   () => import('react-paystack').then((mod) => mod.PaystackButton),
   { ssr: false }
 );

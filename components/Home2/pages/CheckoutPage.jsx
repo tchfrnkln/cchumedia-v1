@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useStore } from '../../../lib/store';
 import { DELIVERY_OPTIONS, PAYMENT_OPTIONS, CONFIG, formatNaira } from '../../../lib/data';
 import Button from '../ui/Button';
 import { Banknote, Check, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { PaystackButton } from '@/components/Dashboard/Checkout/CheckOutPage';
 
 export default function CheckoutPage() {
   const { cart, user, navigate, placeOrder, getCartTotal, showToast, clearCart } = useStore();
@@ -24,6 +25,8 @@ export default function CheckoutPage() {
   const [showBankModal, setShowBankModal] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize delivery and payment options
   useEffect(() => {
@@ -46,8 +49,6 @@ export default function CheckoutPage() {
   ).length;
   const totalCustomDesignFee = customDesignFee * designItems; 
   const total = subtotal - loyaltyDisc + deliveryFee + tax + totalCustomDesignFee;
-
-  console.log("cart", cart);
   
 
   const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
@@ -72,22 +73,24 @@ export default function CheckoutPage() {
     if (payment.id === 'transfer') {
       setShowBankModal(true);
       return;
+    }else if(payment.id === 'whatsapp'){
+
     }
 
     // Process other payment methods
-    const res = placeOrder({
-      delivery: { ...delivery, ...contact },
-      payment,
-      loyaltyPointsUsed: useLoyalty ? loyaltyPts : 0,
-      notes
-    });
+    // const res = placeOrder({
+    //   delivery: { ...delivery, ...contact },
+    //   payment,
+    //   loyaltyPointsUsed: useLoyalty ? loyaltyPts : 0,
+    //   notes
+    // });
 
-    if (res?.error) {
-      showToast(res.error, 'error');
-      return;
-    }
+    // if (res?.error) {
+    //   showToast(res.error, 'error');
+    //   return;
+    // }
 
-    setDone(res.order);
+    // setDone(res.order);
   };
 
   const getButtonText = (paymentId) => {
@@ -148,7 +151,7 @@ export default function CheckoutPage() {
           subtotal,
           tax_amount: tax,
           delivery_fee: deliveryFee,
-          custom_design_fee: customDesignFee,
+          custom_design_fee: totalCustomDesignFee,
           total_amount: total,
           status: 'pending',
         })
@@ -185,9 +188,107 @@ export default function CheckoutPage() {
     }
   };
 
-  // const handlePaystackPayment = async() =>{
+  const handlePayStackSuccess = async (paystackReference) => {
+    handlePlace();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-  // }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || null;
+
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: userId,
+          paystack_reference: paystackReference,
+          payment_method: 'paystack',
+          first_name: contact.name.trim(),
+          last_name: 'N/A',
+          email: contact.email.trim(),
+          phone: contact.phone.trim(),
+          shipping_method: delivery.id === 'pickup' ? delivery.id : 'home',
+          address_line1: contact.address.trim(),
+          address_line2: delivery.label,
+          state: 'N/A',
+          delivery_area: delivery.id,
+          subtotal,
+          tax_amount: tax,
+          delivery_fee: deliveryFee,
+          custom_design_fee: totalCustomDesignFee,
+          total_amount: total,
+          status: 'paid',
+        })
+        .select('id')
+        .single();
+
+      if (orderError || !order?.id) throw orderError || new Error("Failed to create order");
+
+      const orderItems = cart.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        name: item.name || 'Unnamed product',
+        price: (item.total/item.qty) ?? 0,
+        quantity: item.qty,
+        specs: item.config || null,
+        design: item.designData || null,
+      }));
+
+      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+      if (itemsError) throw itemsError;
+
+      showToast(`Payment successful! Order #${order.id} created.`, 'success');
+      clearCart();
+      setDone(order)
+    } catch (err) {
+      console.error(err);
+      showToast(
+        `Payment succeeded but order creation failed.\n` +
+        `Reference: ${paystackReference}\n` +
+        `Error: ${err?.message || 'Unknown error'}`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const reference = useMemo(() => {
+    return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  }, []);
+
+  const paystackConfig = {
+    reference,
+    email: contact.email.trim(),
+    amount: Math.round(total * 100),
+    publicKey: 'pk_test_a361ebecc9edf1b3af278b0b42e9b037a668c872',
+    currency: 'NGN',
+    firstname: contact.name.trim(),
+    lastname: '',
+    phone: contact.phone.trim(),
+    metadata: {
+      custom_fields: [
+        { display_name: 'Shipping Method', variable_name: 'shipping_method', value: delivery?.id },
+        { display_name: 'Delivery Area', variable_name: 'delivery_area', value: contact.address },
+      ],
+    },
+  };
+
+    const isFormValid =
+    contact.name.trim() !== '' &&
+    contact.email.trim() !== '' &&
+    contact.phone.trim() !== '';
+
+  const paystackProps = {
+    ...paystackConfig,
+    text: isSubmitting ? 'Processing...' : 'Pay with Paystack',
+    onSuccess: (response) => handlePayStackSuccess(response.reference),
+    onClose: () => {
+      if (!isSubmitting) showToast('Payment window closed');
+    },
+    disabled: !isFormValid || cart.length === 0 || isSubmitting,
+    className: `btn ${isFormValid && !isSubmitting && cart.length > 0 ? 'btn-primary' : 'btn-disabled'} bg-brand border-0 shadow-none mt-6 w-full rounded-full cursor-pointer disabled:text-gray-400 disabled:bg-brand-light`,
+  };
 
   if (done) {
     return (
@@ -425,9 +526,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <Button className="w-full mt-6" onClick={handlePlace} disabled={!delivery || !payment}>
+              {payment?.id !== 'paystack' ?<Button className="w-full mt-6" onClick={handlePlace} disabled={!delivery || !payment}>
                 {payment ? getButtonText(payment.id) : 'Confirm Order'}
-              </Button>
+              </Button> : <PaystackButton {...paystackProps} />}
 
               <p className="text-xs text-center text-gray-400 mt-3">
                 🔒 Your information is safe and secure
