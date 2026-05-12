@@ -70,7 +70,7 @@ export default function CartDrawer() {
                           <Plus size={12} />
                         </button>
                       </div>
-                      <span className="font-display font-black text-brand text-sm">{formatNaira(item.total)}</span>
+                      <span className="font-display font-black text-brand text-sm">{`${formatNaira(item.total)}`}<p className="text-[8px] text-white font-normal">{item.designData.type ==='design-for-me' ? ' + Design Fee(5k)' : ''}</p></span>
                     </div>
                   </div>
                   <button

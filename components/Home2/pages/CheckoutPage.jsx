@@ -40,8 +40,15 @@ export default function CheckoutPage() {
   const loyaltyDisc = useLoyalty ? Math.min(loyaltyPts, subtotal) : 0;
   const deliveryFee = delivery?.fee || 0;
   const tax = Math.round(subtotal * 0.075);
-  const total = subtotal - loyaltyDisc + deliveryFee + tax;
   const customDesignFee = 5000;
+  const designItems = cart.filter(
+    item => item.designData?.type === 'design-for-me'
+  ).length;
+  const totalCustomDesignFee = customDesignFee * designItems; 
+  const total = subtotal - loyaltyDisc + deliveryFee + tax + totalCustomDesignFee;
+
+  console.log("cart", cart);
+  
 
   const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all';
 
@@ -177,6 +184,10 @@ export default function CheckoutPage() {
       setUploadingReceipt(false);
     }
   };
+
+  // const handlePaystackPayment = async() =>{
+
+  // }
 
   if (done) {
     return (
@@ -370,6 +381,12 @@ export default function CheckoutPage() {
                   <span className="text-gray-500">Delivery</span>
                   <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
                     {deliveryFee === 0 ? 'FREE' : formatNaira(deliveryFee)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Design Fee</span>
+                  <span className={customDesignFee === 0 ? 'text-green-600' : ''}>
+                    {customDesignFee === 0 ? 'FREE' : formatNaira(totalCustomDesignFee)}
                   </span>
                 </div>
                 <div className="flex justify-between">
