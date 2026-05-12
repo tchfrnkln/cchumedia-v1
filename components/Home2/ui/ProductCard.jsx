@@ -12,7 +12,7 @@ const badgeVariant = (badge) => {
 };
 
 export default function ProductCard({ product }) {
-  const { navigate, openModal, toggleWishlist, wishlist, addToCart, showToast } = useStore();
+  const { navigate, openModal, toggleWishlist, wishlist, addToCartFront, showToast } = useStore();
   const isWished = wishlist.includes(product.id);
   const discount = product.origPrice
     ? Math.round((1 - product.basePrice / product.origPrice) * 100)
@@ -39,7 +39,14 @@ export default function ProductCard({ product }) {
           </button>
           <button
             className="p-2.5 bg-white dark:bg-gray-900 rounded-xl shadow-lg hover:bg-brand hover:text-white transition-colors"
-            onClick={e => { e.stopPropagation(); addToCart(product, {}, 1); }}
+            onClick={e => { 
+              e.stopPropagation(); 
+              const defautSpecs = Object.fromEntries(
+                Object.entries(product.specs).map(([key, values]) => [key, values[0]])
+              );
+              let totalPrice = product.order * product.price 
+              addToCartFront(product, defautSpecs, product.order, totalPrice);
+             }}
             title="Add to Cart"
           >
             <ShoppingCart size={16} />

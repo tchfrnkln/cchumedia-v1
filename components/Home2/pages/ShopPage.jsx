@@ -76,9 +76,9 @@ export default function ShopPage() {
 
   const catLabel = CATEGORIES.find(c => c.id === cat)?.label || 'All Products';
 
-  console.log("All Products:", allProducts.length);
-  console.log("Final displayed products:", product.length);
-  console.log("Current category:", cat);
+  // console.log("All Products:", allProducts.length);
+  // console.log("Final displayed products:", product.length);
+  // console.log("Current category:", cat);
 
   return (
     <div className="animate-fade-in">
