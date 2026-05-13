@@ -23,7 +23,8 @@ export type OrderStatus =
   | 'shipped'
   | 'delivered'
   | 'cancelled'
-  | 'refunded';
+  | 'refunded'
+  | 'completed';
 
 export interface Order {
   id: string;

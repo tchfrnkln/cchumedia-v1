@@ -7,6 +7,7 @@ import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { useUserRoleStore } from '@/store/authRole';
 import { useAuthStore } from '@/store/authStore';
+import AdminDashboardMain from './AdminDashboard';
 
 const STATUS_OPTS = ['Pending Payment','Confirmed','Design Review','In Production','Ready','Delivered','Cancelled'];
 const STATUS_COLORS = { 'Pending Payment':'orange','Confirmed':'blue','Design Review':'accent','In Production':'accent','Ready':'green','Delivered':'green','Cancelled':'dark' };
@@ -34,7 +35,9 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="flex min-h-screen animate-fade-in">
+    true ? 
+      <AdminDashboardMain/>
+      : <div className="flex min-h-screen animate-fade-in">
       {/* Sidebar */}
       <nav className="w-52 bg-gray-900 text-white shrink-0 flex flex-col">
         <div className="px-4 py-5 border-b border-gray-800">

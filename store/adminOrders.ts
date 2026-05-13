@@ -78,6 +78,7 @@ export const useAdminOrdersStore = create<AdminOrdersState>((set, get) => ({
       }));
 
       set({ orders: ordersWithItems });
+      
 
       get().applyFilters();
     } catch (err: unknown) {

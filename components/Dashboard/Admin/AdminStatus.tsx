@@ -16,7 +16,7 @@ import { DesignDetails } from '@/store/cartStore';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-/* ---------------- STATUS ---------------- */
+/* ---------------- STATUS ----------------  */
 
 const statuses: (OrderStatus | 'all')[] = [
   'all',

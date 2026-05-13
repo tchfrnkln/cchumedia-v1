@@ -4,11 +4,12 @@ import LogoutButton from '@/components/Auth/LogOut';
 import AdminOrdersPage from '@/components/Dashboard/Admin/AdminStatus';
 import Footer from '@/components/Home/Footer';
 import { Header2 } from '@/components/Home/Header';
+import AdminDashboardMain from '@/components/Home2/pages/AdminDashboard';
 
 export default function DashboadHome() {
 
   return (
-    <div className='w-full min-h-screen'>
+    true ? <AdminDashboardMain/> : <div className='w-full min-h-screen'>
       <div className='w-full fixed top-0 left-0 bg-[#DCD8EF] p-4 z-10'>
         <Header2/>
       </div>
