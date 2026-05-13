@@ -20,6 +20,7 @@ export default function OrdersPage() {
       pending: { color: 'badge-warning', icon: <Clock size={16} /> },
       paid: { color: 'badge-info', icon: <CheckCircle size={16} /> },
       processing: { color: 'badge-primary', icon: <Package size={16} /> },
+      completed: { color: 'badge-neutral', icon: <AlertCircle size={16} /> },
       shipped: { color: 'badge-secondary', icon: <Truck size={16} /> },
       delivered: { color: 'badge-success', icon: <CheckCircle size={16} /> },
       cancelled: { color: 'badge-error', icon: <XCircle size={16} /> },
