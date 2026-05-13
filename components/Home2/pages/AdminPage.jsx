@@ -5,15 +5,22 @@ import { PRODUCTS, CATEGORIES, formatNaira } from '../../../lib/data';
 import { DB } from '../../../lib/db';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import { useUserRoleStore } from '@/store/authRole';
+import { useAuthStore } from '@/store/authStore';
 
 const STATUS_OPTS = ['Pending Payment','Confirmed','Design Review','In Production','Ready','Delivered','Cancelled'];
 const STATUS_COLORS = { 'Pending Payment':'orange','Confirmed':'blue','Design Review':'accent','In Production':'accent','Ready':'green','Delivered':'green','Cancelled':'dark' };
 
 export default function AdminPage() {
-  const { user, navigate, adminTab, updateOrderStatus } = useStore();
+  const { navigate, adminTab, updateOrderStatus } = useStore();
   const setTab = (t) => useStore.setState({ adminTab: t });
+  const { role } = useUserRoleStore();
+  const { user } = useAuthStore()
 
-  if (!user || user.role !== 'admin') return (
+  console.log("user", user);
+  
+
+  if (role !== 'admin' && role !== 'staff') return (
     <div className="max-w-[1380px] mx-auto px-6 py-20 text-center">
       <div className="text-5xl mb-4">🔒</div>
       <h2 className="font-display font-black text-2xl mb-4">Admin Access Required</h2>
@@ -32,7 +39,7 @@ export default function AdminPage() {
       <nav className="w-52 bg-gray-900 text-white shrink-0 flex flex-col">
         <div className="px-4 py-5 border-b border-gray-800">
           <div className="font-display font-black text-sm">⚙️ Admin Panel</div>
-          <div className="text-gray-400 text-xs mt-0.5">{user.name}</div>
+          <div className="text-gray-400 text-xs mt-0.5">{user?.user_metadata.full_name}</div>
         </div>
         <div className="flex-1">
           {navItems.map(([id, ic, lbl]) => (

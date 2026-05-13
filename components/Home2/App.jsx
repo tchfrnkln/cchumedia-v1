@@ -21,6 +21,7 @@ import {
 } from './pages/StaticPages';
 import { BookPublishingPage } from './ui/CategoryShop';
 import { useProductStore } from '@/store/productStore';
+import { useUserRoleStore } from '@/store/authRole';
 
 function Router() {
   const page = useStore(s => s.route.page);
@@ -46,7 +47,9 @@ function Router() {
 
 export default function App() {
   const { init, route } = useStore();
-  const {product, fetchProducts} = useProductStore();
+  const {fetchProducts} = useProductStore();
+  const { getUserRole } = useUserRoleStore();
+  
 
   useEffect(() => {
     init();
@@ -60,8 +63,9 @@ export default function App() {
     };
     window.addEventListener('popstate', onPop);
     fetchProducts()
+    getUserRole()
     return () => window.removeEventListener('popstate', onPop);
-  }, [fetchProducts, init]);
+  }, [getUserRole, fetchProducts, init]);
 
   const isAdmin = route.page === 'admin';
   const isDesignTool = route.page === 'design-tool';

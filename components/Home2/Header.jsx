@@ -5,6 +5,7 @@ import { useStore } from '../../lib/store';
 import { CATEGORIES, CONFIG, PRODUCTS } from '../../lib/data';
 import Button from './ui/Button';
 import { useAuthStore } from '@/store/authStore';
+import { useUserRoleStore } from '@/store/authRole';
 
 export default function Header() {
   const { route, user, cart, theme, setTheme, navigate, openModal } = useStore();
@@ -15,6 +16,8 @@ export default function Header() {
   const [announcementClosed, setAnnouncementClosed] = useState(false);
   const cartCount = cart.length;
   const searchRef = useRef(null);
+  const { role } = useUserRoleStore();
+  
 
   const searchResults = searchVal.length > 1
     ? PRODUCTS.filter(p => p.name.toLowerCase().includes(searchVal.toLowerCase())).slice(0, 6)
@@ -154,7 +157,7 @@ export default function Header() {
                     className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                   >
                     <User size={18} />
-                    {user.role === 'admin' && (
+                    {role == 'admin' && (
                       <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-brand rounded-full text-[7px] text-white font-bold flex items-center justify-center">A</span>
                     )}
                   </button>
@@ -262,7 +265,7 @@ export default function Header() {
                 💬 Quick Quote
               </button>
 
-              {user?.role === 'admin' && (
+              {(role == 'admin' || role == 'staff') && (
                 <button
                   onClick={() => navigate('admin')}
                   className="px-3 py-2 text-xs font-display font-bold whitespace-nowrap rounded-lg text-brand hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
