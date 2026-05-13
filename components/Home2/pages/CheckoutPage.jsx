@@ -69,28 +69,85 @@ export default function CheckoutPage() {
       return;
     }
 
+    const sendOrderToWhatsApp = () => {
+      const itemsText = cart
+        .map((item, index) => {
+          const configText = item.config
+            ? Object.entries(item.config)
+                .map(([key, value]) => `   • ${key}: ${value}`)
+                .join('\n')
+            : '   • No configuration';
+
+          const designText = item.designData
+            ? Object.entries(item.designData)
+                .filter(
+                  ([key]) =>
+                    !['designFile', 'logo'].includes(key)
+                )
+                .map(([key, value]) => `   • ${key}: ${value}`)
+                .join('\n')
+            : '   • No design data';
+
+          return `
+    Item ${index + 1}
+    -------------------------
+    Name: ${item.name}
+    Quantity: ${item.qty}
+    Price: ₦${item.total?.toLocaleString()}
+
+    Configuration:
+    ${configText}
+
+    Design Details:
+    ${designText}
+    `;
+        })
+        .join('\n\n');
+
+      const message = `
+    Hi! I want to place an Order.
+
+    Total Items: ${cart.length}
+    Estimated Total: ₦${total?.toLocaleString()}
+
+    ========================
+    ORDER DETAILS
+    ========================
+
+    ${itemsText}
+
+    ========================
+    DELIVERY DETAILS
+    ========================
+
+    Delivery Method: ${delivery?.label}
+
+    Name: ${contact?.name}
+    Phone: ${contact?.phone}
+    Email: ${contact?.email}
+    Address: ${contact?.address}
+
+    Notes:
+    ${notes || 'No additional notes'}
+    `;
+
+      const whatsappUrl = CONFIG.wa(message);
+
+      window.open(whatsappUrl, '_blank');
+    };
+
     // Show bank transfer modal
     if (payment.id === 'transfer') {
       setShowBankModal(true);
       return;
     }else if(payment.id === 'whatsapp'){
+      return sendOrderToWhatsApp()
+      const whatsappUrl = CONFIG.wa(
+        `Hi! I want to place an Order for ${cart.length} item(s). ${cart.map(item => item.name).join(', ')} which should cost about ${total} \n \nFull Details: ${cart} \n Delivery: ${delivery.label} \n Name: ${contact.name} \n Phone: ${contact.phone} \n Email: ${contact.email} \n Address: ${contact.address} \n Notes: ${notes} `
+      );
 
+      window.open(whatsappUrl, '_blank');
     }
-
-    // Process other payment methods
-    // const res = placeOrder({
-    //   delivery: { ...delivery, ...contact },
-    //   payment,
-    //   loyaltyPointsUsed: useLoyalty ? loyaltyPts : 0,
-    //   notes
-    // });
-
-    // if (res?.error) {
-    //   showToast(res.error, 'error');
-    //   return;
-    // }
-
-    // setDone(res.order);
   };
 
   const getButtonText = (paymentId) => {
@@ -189,7 +246,6 @@ export default function CheckoutPage() {
   };
 
   const handlePayStackSuccess = async (paystackReference) => {
-    handlePlace();
     if (isSubmitting) return;
     setIsSubmitting(true);
 
