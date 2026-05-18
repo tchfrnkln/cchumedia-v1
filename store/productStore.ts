@@ -29,7 +29,12 @@ interface ProductState {
     price: number,
     order: number,
     image: File | null,
-    specs: Record<string, string[]> // <- specs
+    specs: Record<string, string[]>,
+    featured?: boolean,
+    badge?: string,
+    rating?: number,
+    review?: number,
+    cat?: string
   ) => Promise<void>;
   updateProduct: (
     id: string,
@@ -38,7 +43,12 @@ interface ProductState {
     price: number,
     order: number,
     image: File | null,
-    specs: Record<string, string[]> // <- specs
+    specs: Record<string, string[]>, // <- specs
+    featured?: boolean,
+    badge?: string,
+    rating?: number,
+    review?: number,
+    cat?: string
   ) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
 }
@@ -77,7 +87,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   getCategoryCounts: () => get().categoryCounts,
 
 
-  addProduct: async (name, description, price, order, image, specs) => {
+  addProduct: async (name, description, price, order, image, specs, featured, badge, rating, review, cat) => {
     set({ isLoading: true, error: null });
     let image_url: string | null = null;
 
@@ -106,6 +116,11 @@ export const useProductStore = create<ProductState>((set, get) => ({
       order,
       image_url,
       specs, // <- insert specs
+      featured,
+      badge,
+      rating,
+      reviews: review,
+      cat
     });
 
     if (error) {
@@ -119,7 +134,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     toast.success('Product added!');
   },
 
-  updateProduct: async (id, name, description, price, order, image, specs) => {
+  updateProduct: async (id, name, description, price, order, image, specs, featured, badge, rating, review, cat) => {
     set({ isLoading: true, error: null });
     let image_url: string | null = null;
     const existing = get().products.find((p) => p.id === id);
@@ -146,7 +161,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
     const { error } = await supabase
       .from('products')
-      .update({ name, description, price, order, image_url, specs }) // <- update specs
+      .update({ name, description, price, order, image_url, specs, featured, badge, rating, reviews: review, cat }) // <- update specs
       .eq('id', id);
 
     if (error) {

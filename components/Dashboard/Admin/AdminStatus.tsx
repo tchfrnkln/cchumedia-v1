@@ -15,6 +15,7 @@ import { useAdminOrdersStore } from '@/store/adminOrders';
 import { DesignDetails } from '@/store/cartStore';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useProductStore } from '@/store/productStore';
 
 /* ---------------- STATUS ----------------  */
 
@@ -38,12 +39,14 @@ export default function AdminOrdersPage() {
     setSort,
     isLoading,
   } = useAdminOrdersStore();
+  const { fetchProducts } = useProductStore();
 
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   useEffect(() => {
+    fetchProducts();
     fetchAllOrders();
-  }, []);
+  }, [fetchProducts, fetchAllOrders]);
 
   const toggleExpand = (id: string) => {
     setExpandedOrder((prev) => (prev === id ? null : id));

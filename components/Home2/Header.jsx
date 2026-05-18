@@ -6,6 +6,7 @@ import { CATEGORIES, CONFIG, PRODUCTS } from '../../lib/data';
 import Button from './ui/Button';
 import { useAuthStore } from '@/store/authStore';
 import { useUserRoleStore } from '@/store/authRole';
+import Image from 'next/image';
 
 export default function Header() {
   const { route, user, cart, theme, setTheme, navigate, openModal } = useStore();
@@ -71,7 +72,7 @@ export default function Header() {
               onClick={() => navigate('home')}
               className="flex items-center gap-2.5 shrink-0"
             >
-              <div className="w-9 h-9 bg-brand text-white font-display font-black text-xl rounded-xl flex items-center justify-center shadow-lg shadow-red-200 dark:shadow-red-900">P</div>
+              <Image src='/images/icon.png' alt="cchu media" width={50} height={50}></Image>
               <div className="hidden sm:block leading-tight text-left">
                 <div className="font-display font-black text-base text-gray-900 dark:text-white">PrintHub</div>
                 <div className="text-xs text-gray-400">by C-Chu Media Ltd</div>

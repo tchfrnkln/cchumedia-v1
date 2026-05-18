@@ -17,6 +17,9 @@ import {
   initials,
 } from "@/store/adminStaticStore";
 import { useAdminOrdersStore } from "@/store/adminOrders";
+import { useProductStore } from "@/store/productStore";
+import { useAuthStore } from "@/store/authStore";
+import Image from "next/image";
 
 // ─── TINY SHARED UI ───────────────────────────────────────────────────────────
 
@@ -115,13 +118,14 @@ function ToastContainer() {
 // ─── SIDEBAR ──────────────────────────────────────────────────────────────────
 
 function Sidebar() {
+  const { user } = useAuthStore()
   const { page, setPage, sidebarOpen, setSidebarOpen, orders } = useAdminStore();
   const pending = orders.filter((o) => ["Pending Payment", "Design Review"].includes(o.status)).length;
   const NAV = [
     { id: "dashboard", icon: "📊", label: "Dashboard" },
     { id: "orders",    icon: "📦", label: "Orders",   badge: pending },
     { id: "products",  icon: "🛒", label: "Products" },
-    { id: "customers", icon: "👥", label: "Customers" },
+    // { id: "customers", icon: "👥", label: "Customers" },
   ];
   const TOOLS = [
     { icon: "🎨", label: "Design Tool" },
@@ -137,7 +141,7 @@ function Sidebar() {
         {/* Logo */}
         <div className="px-4 py-[18px] border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-[30px] h-[30px] bg-red-600 rounded-[7px] flex items-center justify-center text-white text-[15px] font-black flex-shrink-0">P</div>
+            <Image src='/images/icon.png' alt="cchu media" width={40} height={40}></Image>
             <div>
               <div className="font-black text-[15px] text-gray-900 leading-tight">PrintHub</div>
               <div className="text-[11px] text-gray-400 mt-0.5">Admin Panel</div>
@@ -178,9 +182,9 @@ function Sidebar() {
         {/* User */}
         <div className="border-t border-gray-100 p-2">
           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-            <div className="w-[30px] h-[30px] rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-black flex-shrink-0">SU</div>
+            <div className="w-[30px] h-[30px] rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-black flex-shrink-0 hidden">SU</div>
             <div className="flex-1 min-w-0">
-              <div className="text-[12px] font-bold text-gray-800 truncate">Silas Umekwe</div>
+              <div className="text-[12px] font-bold text-gray-800 truncate">{user?.email}</div>
               <div className="text-[10px] text-gray-400">Super Admin</div>
             </div>
             <span className="text-gray-300 text-xs">⋯</span>
@@ -230,11 +234,11 @@ function Topbar({ onNewOrder }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search orders, products, customers…"
-          className="bg-transparent outline-none text-[13px] text-gray-700 placeholder-gray-400 w-full"
+          className="hidden bg-transparent outline-none text-[13px] text-gray-700 placeholder-gray-400 w-full"
         />
       </form>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-2 hidden">
         <button onClick={() => toast("No new notifications", "info")} className="relative w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
           🔔
           <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-600 rounded-full border border-white" />
@@ -261,20 +265,25 @@ const CAT_COLORS = ["#D42B2B","#7B7EC8","#2563eb","#059669","#d97706","#0891b2"]
 const CAT_LABELS = { banners:"Banners", apparel:"Apparel", flyers:"Flyers", books:"Books", signage:"Signage", souvenirs:"Souvenirs", cards:"Cards", campaign:"Campaign" };
 
 function Dashboard() {
-  const { orders, products, customers, setPage, selectOrder } = useAdminStore();
-  const totalRev = orders.filter((o) => o.status !== "Cancelled").reduce((s, o) => s + o.total, 0);
-  const pending = orders.filter((o) => ["Pending Payment","Design Review","In Production"].includes(o.status));
+  const { customers, setPage, selectOrder } = useAdminStore();
+  const { products } = useProductStore()
+  const { orders } = useAdminOrdersStore();
+  const totalRev = orders.filter((o) => o.status !== "cancelled" && o.status !== "refunded" ).reduce((s, o) => s + o.total_amount, 0);
+  const pending = orders.filter((o) => ["pending"].includes(o.status));
+
 
   const catRev = {};
-  orders.filter((o) => o.status !== "Cancelled").forEach((o) =>
+  orders.filter((o) => o.status !== "cancelled" && o.status !== "refunded").forEach((o) =>
     o.items.forEach((i) => {
       const p = products.find((x) => x.name === i.name);
       const cat = p?.cat || "other";
-      catRev[cat] = (catRev[cat] || 0) + i.price;
+      catRev[cat] = (catRev[cat] || 0) + o.total_amount;
     })
   );
-  const sorted = Object.entries(catRev).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  
+  const sorted = Object.entries(catRev).sort((a, b) => b[1] - a[1]);
   const maxRev = sorted[0]?.[1] || 1;
+  
 
   const STATS = [
     { icon:"💰", val:fmtNaira(totalRev),                               label:"Total revenue",     delta:"↑ +18% vs last month",  up:true  },
@@ -300,7 +309,7 @@ function Dashboard() {
             <div className="text-2xl mb-2">{s.icon}</div>
             <div className="text-2xl font-black text-gray-900">{s.val}</div>
             <div className="text-[12px] text-gray-400 font-semibold mt-1">{s.label}</div>
-            <div className={`text-[11px] font-bold mt-1.5 ${s.up ? "text-emerald-600" : "text-red-500"}`}>{s.delta}</div>
+            <div className={`text-[11px] font-bold mt-1.5 ${s.up ? "text-emerald-600" : "text-red-500"} hidden`}>{s.delta}</div>
           </div>
         ))}
       </div>
@@ -329,12 +338,12 @@ function Dashboard() {
                     onClick={() => { setPage("orders"); selectOrder(o.id); }}
                     className="cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                   >
-                    <td className="px-4 py-3 font-black text-red-600 text-[12px]">{o.id}</td>
+                    <td className="px-4 py-3 font-black text-red-600 text-[12px]">{o.id.slice(0,7)}...</td>
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-gray-800">{o.customer}</div>
+                      <div className="font-semibold text-gray-800">{o.first_name}</div>
                       <div className="text-[11px] text-gray-400">{o.phone}</div>
                     </td>
-                    <td className="px-4 py-3 font-bold text-gray-800">{fmtNaira(o.total)}</td>
+                    <td className="px-4 py-3 font-bold text-gray-800">{fmtNaira(o.total_amount)}</td>
                     <td className="px-4 py-3"><StatusPill status={o.status} /></td>
                   </tr>
                 ))}
@@ -711,7 +720,8 @@ function NewOrderModal({ open, onClose }) {
 const SIZE_MULS = { A6:0.55, A5:0.7, A4:1, A3:1.4, Custom:1.3 };
 
 function ProductDetail({ productId, onEdit }) {
-  const { products, deleteProduct, selectProduct, toast } = useAdminStore();
+  const { selectProduct, toast } = useAdminStore();
+  const {products, deleteProduct} = useProductStore()
   const product = products.find((p) => p.id === productId);
   const [qty, setQty] = useState(100);
   const [size, setSize] = useState("A4");
@@ -725,33 +735,33 @@ function ProductDetail({ productId, onEdit }) {
     if (!confirm(`Delete "${product.name}"?`)) return;
     deleteProduct(product.id);
     toast(`🗑 "${product.name}" deleted`, "info");
+    selectProduct(null)
   }
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-start justify-between gap-2 px-4 py-3.5 border-b border-gray-100 sticky top-0 bg-white z-10">
-        <div className="text-3xl">{product.icon}</div>
         <button onClick={() => selectProduct(null)} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-[13px] transition-colors">✕</button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div>
-          <div className="flex flex-wrap gap-1.5 mb-2">
+          <div className="flex flex-wrap gap-1.5 mb-2 aspect-square bg-gray-50 bg-cover bg-center flex items-center justify-center text-4xl relative rounded" style={{ backgroundImage: `url(${product?.image_url})` }}>
             {product.badge && <span className="bg-red-50 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full">{product.badge}</span>}
             {product.featured && <span className="bg-indigo-50 text-indigo-700 text-[10px] font-black px-2 py-0.5 rounded-full">Featured</span>}
             {origDisc > 0 && <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">-{origDisc}% off</span>}
           </div>
           <h3 className="font-black text-[14px] text-gray-900 leading-snug">{product.name}</h3>
-          <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">{product.desc}</p>
+          <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">{product.description}</p>
         </div>
         <div><SectionLabel>Category</SectionLabel><span className="bg-indigo-50 text-indigo-700 text-[11px] font-bold px-2 py-0.5 rounded-full">{product.cat}</span></div>
         <div>
           <SectionLabel>Pricing</SectionLabel>
-          <div className="font-black text-xl text-red-600">{fmtNaira(product.basePrice)}</div>
+          <div className="font-black text-xl text-red-600">{fmtNaira(product.price)}</div>
           {product.origPrice && <p className="text-[12px] text-gray-400 line-through">{fmtNaira(product.origPrice)} original</p>}
         </div>
         <div><SectionLabel>Rating</SectionLabel><p className="text-[13px] font-semibold text-gray-700">⭐ {product.rating} <span className="text-gray-400 font-normal">({product.reviews.toLocaleString()} reviews)</span></p></div>
         <hr className="border-gray-100" />
-        <div>
+        <div className="hidden">
           <SectionLabel>Quick price calculator</SectionLabel>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -785,33 +795,70 @@ function ProductDetail({ productId, onEdit }) {
 const BADGES = ["","Bestseller","Popular","New","Sale","Premium","Luxury"];
 
 function ProductModal({ open, onClose, editId }) {
-  const { products, saveProduct, toast } = useAdminStore();
+  const { saveProduct, toast } = useAdminStore();
+  const { products, addProduct, updateProduct, deleteProduct } = useProductStore();
   const existing = editId ? products.find((p) => p.id === editId) : null;
-//   const [f, setF] = useState({ name:"", cat:"banners", icon:"", basePrice:"", origPrice:"", rating:"4.8", reviews:"0", badge:"", featured:"true", desc:"" });
-  const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
-
-  const initialForm = useMemo(() => {
+  const [f, setF] = useState(() => {
     if (existing) {
-        return {
-        name: existing.name,
-        cat: existing.cat,
-        icon: existing.icon,
-        basePrice: String(existing.basePrice),
-        origPrice: existing.origPrice
-            ? String(existing.origPrice)
-            : "",
-        rating: String(existing.rating),
-        reviews: String(existing.reviews),
+      return {
+        name: existing.name ?? "",
+        cat: existing.cat ?? "banners",
+        order: existing.order ?? "",
+        icon: existing.icon ?? "",
+        basePrice: String(existing.price ?? ""),
+        origPrice: existing.origPrice ? String(existing.origPrice) : "",
+        rating: String(existing.rating ?? "4.8"),
+        reviews: String(existing.reviews ?? "0"),
         badge: existing.badge ?? "",
-        featured: String(existing.featured),
-        desc: existing.desc,
-        };
+        featured: String(existing.featured ?? true),
+        desc: existing.description ?? "",
+        image: null,                    // new
+        specs: existing.specs ?? {},    // new
+      };
     }
 
     return {
+      name: "",
+      cat: "banners",
+      order: "1",
+      icon: "",
+      basePrice: "",
+      origPrice: "",
+      rating: "4.8",
+      reviews: "0",
+      badge: "",
+      featured: "true",
+      desc: "",
+      image: null,
+      specs: {},
+    };
+  });
+
+  // Reset form when editing different product
+  useEffect(() => {
+    if (existing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setF({
+        name: existing.name ?? "",
+        cat: existing.cat ?? "banners",
+        order: existing.order ?? "",
+        icon: existing.icon ?? "",
+        basePrice: String(existing.price ?? ""),
+        origPrice: existing.origPrice ? String(existing.origPrice) : "",
+        rating: String(existing.rating ?? "4.8"),
+        reviews: String(existing.reviews ?? "0"),
+        badge: existing.badge ?? "",
+        featured: String(existing.featured ?? true),
+        desc: existing.description ?? "",
+        image: null,                     // File input can't be pre-filled
+        specs: existing.specs ?? {},
+      });
+    } else {
+      setF({
         name: "",
         cat: "banners",
+        order: "0",
         icon: "",
         basePrice: "",
         origPrice: "",
@@ -820,34 +867,237 @@ function ProductModal({ open, onClose, editId }) {
         badge: "",
         featured: "true",
         desc: "",
-    };
-    }, [existing]);
+        image: null,
+        specs: {},
+      });
+    }
+  }, [existing]);
 
-  const [f, setF] = useState(initialForm);
+  const set = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
 
-  function save() {
-    if (!f.name.trim() || !f.basePrice) { toast("Name and base price are required", "error"); return; }
-    saveProduct({ id:existing?.id??("p"+Date.now().toString(36)), name:f.name.trim(), cat:f.cat, icon:f.icon||"🛒", basePrice:parseFloat(f.basePrice), origPrice:f.origPrice?parseFloat(f.origPrice):null, rating:parseFloat(f.rating)||4.8, reviews:parseInt(f.reviews)||0, badge:f.badge||null, featured:f.featured==="true", desc:f.desc });
+  // Image handler
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setF((p) => ({ ...p, image: file }));
+  };
+
+  // Specifications handlers
+  const handleSpecOptionsChange = (specKey, value) => {
+    const options = value.split(",").map((opt) => opt.trim()).filter(Boolean);
+    setF((p) => ({
+      ...p,
+      specs: {
+        ...p.specs,
+        [specKey]: options,
+      },
+    }));
+  };
+
+  const handleSpecNameChange = (oldKey, newKey) => {
+    if (oldKey === newKey) return;
+    setF((p) => {
+      const specs = { ...p.specs };
+      specs[newKey] = specs[oldKey];
+      delete specs[oldKey];
+      return { ...p, specs };
+    });
+  };
+
+  const addNewSpec = () => {
+    setF((p) => {
+      const newKey = `spec${Object.keys(p.specs).length + 1}`;
+      return {
+        ...p,
+        specs: {
+          ...p.specs,
+          [newKey]: ["Option1"],
+        },
+      };
+    });
+  };
+
+  const removeSpec = (specKey) => {
+    setF((p) => {
+      const specs = { ...p.specs };
+      delete specs[specKey];
+      return { ...p, specs };
+    });
+  };
+
+  function strToBool(s) {
+    if (typeof s !== 'string') return Boolean(s);
+    
+    s = s.trim().toLowerCase();
+    return ['true', '1', 'yes', 'y', 'on'].includes(s);
+  }
+
+  const save = async (id) => {
+    // return console.log("Form Data", f);
+    
+
+    if (!f.name.trim() || !f.basePrice) {
+      toast("Name and base price are required", "error");
+      return;
+    }else if(!f.image && !editId){
+      toast("Add an Image to Continue", "error");
+      return;
+    }
+
+    if(id){
+      updateProduct(
+        id,
+        f.name,
+        f.description,
+        Number(f.basePrice),
+        Number(f.order),
+        f.image, // null = keep existing, File = replace
+        f.specs,
+        strToBool(f.featured),
+        f.badge,
+        Number(f.rating),
+        Number(f.reviews),
+        f.cat
+      );
+    }else{
+      await addProduct(
+        f.name,
+        f.desc,
+        Number(f.basePrice),
+        Number(f.order),
+        f.image,
+        f.specs,
+        strToBool(f.featured),
+        f.badge,
+        Number(f.rating),
+        Number(f.reviews),
+        f.cat
+      );
+    }
+
     toast(existing ? `✅ "${f.name}" updated` : `✅ "${f.name}" added`, "success");
     onClose();
   }
 
   const lbl = "block text-[11px] font-black uppercase tracking-wide text-gray-400 mb-1";
+
   return (
-    <Modal open={open} onClose={onClose} title={existing ? "Edit product" : "Add new product"}
-      footer={<><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn variant="primary" onClick={save}>Save product</Btn></>}
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={existing ? "Edit product" : "Add new product"}
+      footer={
+        <>
+          <Btn variant="ghost" onClick={onClose}>Cancel</Btn>
+          <Btn variant="primary" onClick={() => save(editId)}>Save product</Btn>
+        </>
+      }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2"><label className={lbl}>Product name *</label><Input placeholder="e.g. Roll-up Banner 85×200cm" value={f.name} onChange={set("name")} /></div>
-        <div><label className={lbl}>Category *</label><Select value={f.cat} onChange={set("cat")}>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}</Select></div>
-        <div><label className={lbl}>Icon (emoji)</label><Input placeholder="🏷️" value={f.icon} onChange={set("icon")} /></div>
-        <div><label className={lbl}>Base price (₦) *</label><Input type="number" placeholder="8000" value={f.basePrice} onChange={set("basePrice")} /></div>
-        <div><label className={lbl}>Original price (₦)</label><Input type="number" placeholder="Blank if no discount" value={f.origPrice} onChange={set("origPrice")} /></div>
-        <div><label className={lbl}>Rating</label><Input type="number" step="0.1" min="1" max="5" value={f.rating} onChange={set("rating")} /></div>
-        <div><label className={lbl}>Reviews count</label><Input type="number" value={f.reviews} onChange={set("reviews")} /></div>
-        <div><label className={lbl}>Badge</label><Select value={f.badge} onChange={set("badge")}>{BADGES.map((b) => <option key={b} value={b}>{b||"None"}</option>)}</Select></div>
-        <div><label className={lbl}>Featured?</label><Select value={f.featured} onChange={set("featured")}><option value="true">Yes</option><option value="false">No</option></Select></div>
-        <div className="sm:col-span-2"><label className={lbl}>Description</label><Input placeholder="Short description" value={f.desc} onChange={set("desc")} /></div>
+        <div className="sm:col-span-2">
+          <label className={lbl}>Product name *</label>
+          <Input placeholder="e.g. Roll-up Banner 85×200cm" value={f.name} onChange={set("name")} />
+        </div>
+
+        <div>
+          <label className={lbl}>Category *</label>
+          <Select value={f.cat} onChange={set("cat")}>
+            {CATEGORIES.map((c) => (
+              <option key={c.id} value={c.id}>{c.label}</option>
+            ))}
+          </Select>
+        </div>
+
+        <div>
+          <label className={lbl}>Min Order Quantity</label>
+          <Input placeholder="1" value={f.order} onChange={set("order")} />
+        </div>
+
+        <div>
+          <label className={lbl}>Price (₦) *</label>
+          <Input type="number" placeholder="8000" value={f.basePrice} onChange={set("basePrice")} />
+        </div>
+
+        <div className="hidden">
+          <label className={lbl}>Original price (₦)</label>
+          <Input type="number" placeholder="Blank if no discount" value={f.origPrice} onChange={set("origPrice")} />
+        </div>
+
+        <div>
+          <label className={lbl}>Rating</label>
+          <Input type="number" step="0.1" min="1" max="5" value={f.rating} onChange={set("rating")} />
+        </div>
+
+        <div>
+          <label className={lbl}>Reviews count</label>
+          <Input type="number" value={f.reviews} onChange={set("reviews")} />
+        </div>
+
+        <div>
+          <label className={lbl}>Badge</label>
+          <Select value={f.badge} onChange={set("badge")}>
+            {BADGES.map((b) => (
+              <option key={b} value={b}>{b || "None"}</option>
+            ))}
+          </Select>
+        </div>
+
+        <div>
+          <label className={lbl}>Featured?</label>
+          <Select value={f.featured} onChange={set("featured")}>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </Select>
+        </div>
+
+        {/* Image Upload */}
+        <div className="sm:col-span-2">
+          <label className={lbl}>Product Image</label>
+          <Input type="file" accept="image/*" onChange={handleImageChange} />
+          {existing?.image && !f.image && (
+            <p className="text-xs text-gray-500 mt-1">Current image will be kept unless replaced.</p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="sm:col-span-2">
+          <label className={lbl}>Description</label>
+          <Input placeholder="Short description" value={f.desc} onChange={set("desc")} />
+        </div>
+
+        {/* Specifications */}
+        <div className="sm:col-span-2 mt-4">
+          <h3 className={lbl}>Specifications</h3>
+
+          {Object.entries(f.specs || {}).map(([key, options]) => (
+            <div key={key} className="w-full flex gap-2 mb-3 items-start">
+              <Input
+                placeholder="Spec name (e.g. Size)"
+                value={key}
+                className="w-1/3"
+                onChange={(e) => handleSpecNameChange(key, e.target.value)}
+              />
+              <Input
+                placeholder="Options (comma separated)"
+                value={options.join(", ")}
+                className="w-1/3"
+                onChange={(e) => handleSpecOptionsChange(key, e.target.value)}
+              />
+              <Btn
+                variant="ghost"
+                onClick={() => removeSpec(key)}
+              >
+                ✕
+              </Btn>
+            </div>
+          ))}
+
+          <Btn
+            variant="primary"
+            onClick={addNewSpec}
+          >
+            + Add Specification
+          </Btn>
+        </div>
       </div>
     </Modal>
   );
@@ -856,13 +1106,54 @@ function ProductModal({ open, onClose, editId }) {
 // ─── PRODUCTS PAGE ────────────────────────────────────────────────────────────
 
 function Products() {
-  const { products, productView, productCat, productSearch, selectedProductId, setProductView, setProductCat, setProductSearch, selectProduct, getFilteredProducts } = useAdminStore();
+  const { productView, productSearch, selectedProductId, setProductView, setProductSearch, selectProduct } = useAdminStore();
+  const { products } = useProductStore()
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const list = getFilteredProducts();
+  // const list = products;
+  const [list, setList] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState('all')
+
+  useEffect(() => {
+    if (!products.length || !list.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setList(products);
+      return;
+    }
+
+    setList(currentList => {
+      return currentList
+        .map(item => {
+          // Find matching product by id (change 'id' if your key is different)
+          const updatedProduct = products.find(p => p.id === item.id);
+          
+          // If product still exists in store, use fresh data
+          return updatedProduct ? { ...updatedProduct } : item;
+        })
+        .filter(Boolean); // remove null/undefined if you want to clean deleted items
+    });
+  }, [products]);
 
   function openEdit(id) { setEditId(id); setModalOpen(true); }
   function openAdd() { setEditId(null); setModalOpen(true); }
+
+  const sortByCategorie = (x) => {
+    setSelectedCategory(x)
+    if (x === 'all') {
+      setList(products)
+      return
+    }
+
+    const filtered = products.filter((p) => p.cat === x)
+    setList(filtered)
+  }
+
+  const CATEGORIES = [
+    ...new Set(products.map((p) => p.cat))
+  ].map((cat) => ({
+    id: cat,
+    label: cat,
+  }))
 
   return (
     <div className="p-4 md:p-6">
@@ -879,11 +1170,11 @@ function Products() {
               </button>
             ))}
           </div>
-          <select value={productCat} onChange={(e) => setProductCat(e.target.value)} className="border border-gray-200 rounded-lg px-3 py-1.5 text-[12px] text-gray-600 bg-white outline-none focus:border-red-500 h-8">
+          <select value={selectedCategory} onChange={(e) => sortByCategorie(e.target.value)} className="border border-gray-200 rounded-lg px-3 py-1.5 text-[12px] text-gray-600 bg-white outline-none focus:border-red-500 h-8">
             <option value="all">All categories</option>
             {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 h-8">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 h-8 hidden">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             <input value={productSearch} onChange={(e) => setProductSearch(e.target.value)} placeholder="Search products…" className="bg-transparent outline-none text-[12px] text-gray-700 placeholder-gray-400 w-32" />
           </div>
@@ -899,14 +1190,17 @@ function Products() {
           {productView === "grid" && list.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {list.map((p) => {
-                const disc = p.origPrice ? Math.round((1-p.basePrice/p.origPrice)*100) : 0;
+                // const disc = p.origPrice ? Math.round((1-p.basePrice/p.origPrice)*100) : 0;
                 return (
                   <div key={p.id} onClick={() => selectProduct(p.id)} className={`bg-white rounded-xl border cursor-pointer transition-all overflow-hidden group ${selectedProductId===p.id ? "border-red-500 ring-2 ring-red-100" : "border-gray-100 hover:border-red-500 hover:shadow-md hover:-translate-y-0.5"}`}>
-                    <div className="aspect-square bg-gray-50 flex items-center justify-center text-4xl relative">
+                    <div
+                      className="aspect-square bg-gray-50 bg-cover bg-center flex items-center justify-center text-4xl relative"
+                      style={{ backgroundImage: `url(${p?.image_url})` }}
+                    >
                       {p.icon}
                       <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
                         {p.badge && <span className="bg-red-50 text-red-600 text-[9px] font-black px-1.5 py-0.5 rounded-full">{p.badge}</span>}
-                        {disc>0 && <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded-full">-{disc}%</span>}
+                        {/* {disc>0 && <span className="bg-emerald-50 text-emerald-700 text-[9px] font-black px-1.5 py-0.5 rounded-full">-{disc}%</span>} */}
                       </div>
                       <div onClick={(e) => { e.stopPropagation(); openEdit(p.id); }} className="absolute inset-x-0 bottom-0 bg-red-600 text-white text-[11px] font-bold py-1.5 text-center opacity-0 group-hover:opacity-100 translate-y-full group-hover:translate-y-0 transition-all">✏ Edit</div>
                     </div>
@@ -914,7 +1208,7 @@ function Products() {
                       <div className="text-[9px] font-black uppercase tracking-wide text-gray-400 mb-0.5">{p.cat}</div>
                       <div className="text-[12px] font-black text-gray-800 leading-tight line-clamp-2 mb-1.5">{p.name}</div>
                       <div className="flex items-baseline gap-1.5">
-                        <span className="font-black text-red-600 text-[13px]">{fmtNaira(p.basePrice)}</span>
+                        <span className="font-black text-red-600 text-[13px]">{fmtNaira(p.price)}</span>
                         {p.origPrice && <span className="text-[10px] text-gray-400 line-through">{fmtNaira(p.origPrice)}</span>}
                       </div>
                       <div className="text-[10px] text-amber-500 mt-1">⭐ {p.rating} <span className="text-gray-400">({p.reviews.toLocaleString()})</span></div>
@@ -931,15 +1225,14 @@ function Products() {
               <div className="overflow-x-auto">
                 <table className="w-full text-[13px] min-w-[700px]">
                   <thead className="bg-gray-50">
-                    <tr>{["","Name","Category","Base price","Rating","Reviews","Badge","Featured",""].map((h,i) => <th key={i} className="text-left px-4 py-2.5 text-[10px] font-black uppercase tracking-wide text-gray-400 border-b border-gray-100">{h}</th>)}</tr>
+                    <tr>{["Name","Category","Base price","Rating","Reviews","Badge","Featured",""].map((h,i) => <th key={i} className="text-left px-4 py-2.5 text-[10px] font-black uppercase tracking-wide text-gray-400 border-b border-gray-100">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {list.map((p) => (
                       <tr key={p.id} onClick={() => selectProduct(p.id)} className={`cursor-pointer border-b border-gray-50 transition-colors ${selectedProductId===p.id ? "bg-red-50" : "hover:bg-gray-50"}`}>
-                        <td className="px-4 py-3 text-xl text-center">{p.icon}</td>
-                        <td className="px-4 py-3"><div className="font-semibold text-gray-800">{p.name}</div><div className="text-[11px] text-gray-400 max-w-xs truncate">{p.desc}</div></td>
+                        <td className="px-4 py-3"><div className="font-semibold text-gray-800">{p.name}</div><div className="text-[11px] text-gray-400 max-w-xs truncate">{p.description}</div></td>
                         <td className="px-4 py-3"><span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{p.cat}</span></td>
-                        <td className="px-4 py-3 font-bold text-red-600">{fmtNaira(p.basePrice)}</td>
+                        <td className="px-4 py-3 font-bold text-red-600">{fmtNaira(p.price)}</td>
                         <td className="px-4 py-3 text-gray-600">⭐ {p.rating}</td>
                         <td className="px-4 py-3 text-gray-500">{p.reviews.toLocaleString()}</td>
                         <td className="px-4 py-3">{p.badge ? <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">{p.badge}</span> : <span className="text-gray-300">—</span>}</td>

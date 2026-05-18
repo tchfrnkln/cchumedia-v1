@@ -1,6 +1,7 @@
 'use client';
 import { useStore } from '../../lib/store';
 import { CONFIG, CATEGORIES } from '../../lib/data';
+import Image from 'next/image';
 
 export default function Footer() {
   const { navigate, route } = useStore();
@@ -45,7 +46,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <button onClick={() => navigate('home')} className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-brand text-white font-display font-black text-xl rounded-xl flex items-center justify-center">P</div>
+              <Image src='/images/icon.png' alt="cchu media" width={50} height={50}></Image>
               <div className="leading-tight text-left">
                 <div className="font-display font-black text-sm">PrintHub</div>
                 <div className="text-xs text-gray-400">by C-Chu Media Ltd</div>
@@ -57,6 +58,7 @@ export default function Footer() {
             <div className="space-y-1.5 text-sm text-gray-400">
               <div>📍 {CONFIG.address}</div>
               <div>📞 <a href={`tel:${CONFIG.phone1}`} className="hover:text-white transition-colors">{CONFIG.phone1}</a></div>
+              <div>📞 <a href={`tel:${CONFIG.phone2}`} className="hover:text-white transition-colors">{CONFIG.phone2}</a></div>
               <div>✉️ <a href={`mailto:${CONFIG.email}`} className="hover:text-white transition-colors">{CONFIG.email}</a></div>
               <div>⏰ {CONFIG.hours}</div>
             </div>

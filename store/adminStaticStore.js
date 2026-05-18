@@ -227,7 +227,7 @@ export const useAdminStore = create((set, get) => ({
   customers: SEED_CUSTOMERS,
 
   // ── navigation ────────────────────────────────────────────────────────────
-  page: "orders",           // "dashboard" | "orders" | "products" | "customers"
+  page: "dashboard",           // "dashboard" | "orders" | "products" | "customers"
   setPage: (page) => set({ page, sidebarOpen: false }),
 
   // ── sidebar ───────────────────────────────────────────────────────────────

@@ -77,8 +77,8 @@ export function Footer2() {
           <div>
             <div className="uppercase text-xs tracking-widest text-white/40 mb-4">Contact</div>
             <div className="space-y-2 text-sm text-white/70">
-              <a href="tel:+2349015599370" className="block hover:text-white">+234 901 559 9370</a>
               <a href="tel:+2348063753209" className="block hover:text-white">+234 806 375 3209</a>
+              <a href="tel:+2348052929523" className="block hover:text-white">+234 805 292 9523</a>
               <a href="mailto:info@cchumedia.com" className="block hover:text-white">info@cchumedia.com</a>
               <a href="https://wa.me/2348052929523" className="block hover:text-white">WhatsApp</a>
               <div className="text-xs text-white/50 mt-4">
