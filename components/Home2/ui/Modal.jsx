@@ -12,13 +12,13 @@ export default function Modal({ type, title, children, maxWidth = 'max-w-lg' }) 
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
             <h2 className="font-display font-black text-lg">{title}</h2>
-            <button onClick={closeModal} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <button onClick={closeModal} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-brand dark:text-white">
               <X size={18} />
             </button>
           </div>
         )}
         {!title && (
-          <button onClick={closeModal} className="absolute top-4 right-4 z-10 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={closeModal} className="absolute top-4 right-4 z-10 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-brand dark:text-white">
             <X size={18} />
           </button>
         )}

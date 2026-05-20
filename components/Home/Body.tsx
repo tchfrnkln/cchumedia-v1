@@ -31,7 +31,7 @@ const Body = () => {
         <div className='flex flex-col gap-3 items-center justify-center text-center'>
             <h1 className='font-bold text-md md:text-xl flex gap-1'>Why <p className='text-[#B91C1C]'>Choose</p></h1>
             <h1 className='font-bold text-2xl md:text-5xl'>C-Chu Media</h1>
-            <p className='w-full md:w-1/2'>Since our founding in 2011 and official incorporation in 2013, C-Chu Media Limited has become a go-to name for top-notch media services and solutions. We’re dedicated to delivering excellence to individuals, businesses, and organizations around the world. Our focus on quality and speed ensures that every project is completed on time, with no compromise on value. Our mission is to offer cutting-edge services with outstanding quality, quick turnaround, and fair pricing, making us a standout player in the media industry. Whether you need printing, branding, or digital media services, we’re committed to exceeding your expectations and leading the way in innovation.</p>
+            <p className='w-full md:w-1/2'>Since our founding in 2013 and official incorporation in 2013, C-Chu Media Limited has become a go-to name for top-notch media services and solutions. We’re dedicated to delivering excellence to individuals, businesses, and organizations around the world. Our focus on quality and speed ensures that every project is completed on time, with no compromise on value. Our mission is to offer cutting-edge services with outstanding quality, quick turnaround, and fair pricing, making us a standout player in the media industry. Whether you need printing, branding, or digital media services, we’re committed to exceeding your expectations and leading the way in innovation.</p>
 
             <div className='grid grid-cols-3 gap-5 py-10'>
                 {whyChooseImages.map((image, index) => (
@@ -139,7 +139,7 @@ export function Body2() {
 
             <p className="hero-sub text-lg md:text-xl text-white/65 max-w-lg mb-10 font-light md:mb-1">
               Browse, book, and manage all your printing needs from your phone or laptop. 
-              Banners, branding, souvenirs, books and more — trusted by 3,000+ clients since 2011.
+              Banners, branding, souvenirs, books and more — trusted by 3,000+ clients since 2013.
             </p>
 
             <div className="w-full hero-ctas flex flex-wrap justify-start gap-4 mb-12 md:mb-2">
@@ -371,7 +371,7 @@ export function Body2() {
             </div>
             <div className="clients-stat text-right">
               <div className="clients-stat-num font-display  text-5xl md:text-6xl font-black text-[var(--cchu-red)]">3,000+</div>
-              <div className="clients-stat-label text-white/50 text-sm">Jobs delivered since 2011</div>
+              <div className="clients-stat-label text-white/50 text-sm">Jobs delivered since 2013</div>
             </div>
           </div>
 

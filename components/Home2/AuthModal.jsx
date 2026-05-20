@@ -4,9 +4,10 @@ import { useStore } from '../../lib/store';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import { useAuthStore } from '@/store/authStore';
+import Image from 'next/image';
 
 export default function AuthModal() {
-  const { register, showToast, closeModal } = useStore();
+  const { showToast, closeModal } = useStore();
   const { login, signup, user } = useAuthStore();
   const [tab, setTab] = useState('login');
   const [loading, setLoading] = useState(false);
@@ -51,22 +52,22 @@ export default function AuthModal() {
     setLoading(false);
   };
 
-  const inp = 'w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all text-white';
+  const inp = 'w-full dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900 transition-all dark:text-white';
 
   return (
     <Modal type="auth" maxWidth="max-w-md">
-      <div className="p-6">
+      <div className="p-6 text-gray-900 dark:text-white">
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-6">
-          <div className="w-10 h-10 bg-brand text-white font-display font-black text-xl rounded-xl flex items-center justify-center">P</div>
+          <Image src='/images/icon.png' alt="cchu media" width={50} height={50}></Image>
           <div>
-            <div className="font-display font-black text-white">PrintHub</div>
+            <div className="font-display font-black text-base text-gray-900 dark:text-white">PrintHub</div>
             <div className="text-xs text-gray-400">by C-Chu Media Ltd</div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 mb-6">
+        <div className="flex bg-gray-200 dark:bg-gray-800 rounded-xl p-1 mb-6">
           {['login', 'register'].map(t => (
             <button key={t} onClick={() => { setTab(t); setErr(''); }}
               className={`flex-1 py-2 text-sm font-display font-bold rounded-lg transition-all ${tab === t ? 'bg-white dark:bg-gray-900 shadow text-brand' : 'text-gray-500 hover:text-gray-700'}`}>
@@ -88,9 +89,6 @@ export default function AuthModal() {
             <Button type='submit' className="w-full" disabled={loading}>
               {loading ? 'Logging in...' : 'Login to Account'}
             </Button>
-            <p className="text-xs text-center text-gray-400">
-              Demo admin: <strong>admin@cchumedia.com</strong> / <strong>admin123</strong>
-            </p>
           </form>
         ) : (
           <form className="space-y-3" onSubmit={e => { e.preventDefault(); handleRegister(); }}>

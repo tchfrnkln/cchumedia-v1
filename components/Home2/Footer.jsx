@@ -53,7 +53,7 @@ export default function Footer() {
               </div>
             </button>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Professional printing and branding solutions for businesses across Nigeria. Est. 2011 · Birthing your Imagination...
+              Professional printing and branding solutions for businesses across Nigeria. Est. 2013 · Birthing your Imagination...
             </p>
             <div className="space-y-1.5 text-sm text-gray-400">
               <div>📍 {CONFIG.address}</div>
@@ -103,7 +103,7 @@ export default function Footer() {
           <span>© 2025 C-Chu Media Ltd · All rights reserved · RC: 1234567</span>
           <div className="flex items-center gap-3">
             <span>💳 Paystack</span>
-            <span>💳 Flutterwave</span>
+            {/* <span>💳 Flutterwave</span> */}
             <span>🏦 Bank Transfer</span>
             <span>💬 WhatsApp Pay</span>
           </div>

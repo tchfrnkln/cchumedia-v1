@@ -96,7 +96,7 @@ export default function HomePage() {
               {/* Hero content */}
               <div className="flex-1 text-white">
                 <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 text-xs font-semibold mb-6">
-                  🔴 Now Live Online · Est. 2011 · Karu, Abuja FCT
+                  🔴 Now Live Online · Est. 2013 · Karu, Abuja FCT
                 </div>
                 <h1 className="font-display font-black text-3xl md:text-4xl leading-tight mb-4">
                   Nigeria&apos;s Finest<br />
@@ -104,7 +104,7 @@ export default function HomePage() {
                   Portal
                 </h1>
                 <p className="text-white/70 text-lg mb-8 max-w-xl">
-                  Order banners, business cards, branded apparel, signage, books and more. Trusted by 3,000+ clients since 2011.
+                  Order banners, business cards, branded apparel, signage, books and more. Trusted by 3,000+ clients since 2013.
                 </p>
                 <div className="flex flex-wrap gap-3 mb-10">
                   <Button size="lg" onClick={() => navigate('shop')}>🛒 Shop Products</Button>
@@ -114,7 +114,7 @@ export default function HomePage() {
                 </div>
                 {/* Stats */}
                 <div className="grid grid-cols-4 gap-6 max-w-lg">
-                  {[['3,000+','Jobs Delivered'],['13+','Years in Business'],['₦3k','Prices From'],['24hr','Rush Available']].map(([v,l]) => (
+                  {[['3,000+','Jobs Delivered'],['13+','Years in Business'],['24hr','Rush Available']].map(([v,l]) => (
                     <div key={l}>
                       <div className="font-display font-black text-2xl text-white">{v}</div>
                       <div className="text-white/50 text-xs mt-0.5">{l}</div>
@@ -200,7 +200,7 @@ export default function HomePage() {
             <section className="mb-14 bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 text-white">
               <div className="text-center mb-8">
                 <h2 className="font-display font-black text-3xl mb-2">Why Choose PrintHub?</h2>
-                <p className="text-white/60">Nigeria&apos;s most trusted print partner since 2011</p>
+                <p className="text-white/60">Nigeria&apos;s most trusted print partner since 2013</p>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {[
@@ -208,7 +208,7 @@ export default function HomePage() {
                   { icon: '🎨', title: 'Free Design Review', desc: 'Expert preflight on every file. 300 DPI quality guaranteed.' },
                   { icon: '💰', title: 'Best Prices', desc: 'Prices from ₦500. Bulk discounts up to 20% off.' },
                   { icon: '🔄', title: 'Free Reprint', desc: "If it doesn't match your proof, we reprint for free." },
-                  { icon: '📦', title: 'Nationwide Delivery', desc: 'GIG & DHL delivery across all 36 states.' },
+                  { icon: '📦', title: 'Nationwide Delivery', desc: 'Pickup and Delivery across all 36 states.' },
                   { icon: '⭐', title: 'Loyalty Rewards', desc: 'Earn 2% points on every order. Redeem for discounts.' },
                 ].map(f => (
                   <div key={f.title} className="flex gap-3">

@@ -88,7 +88,7 @@ export default function ProductCard({ product }) {
           className="mt-3 w-full py-2 bg-brand text-white text-xs font-display font-bold rounded-lg hover:bg-brand-dark transition-colors"
           onClick={() => navigate('product', { id: product.id })}
         >
-          Configure & Order
+          Place Order
         </button>
       </div>
     </div>

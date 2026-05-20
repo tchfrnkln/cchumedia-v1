@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useStore } from '../../lib/store';
 import Header from './Header';
-import Footer from './Footer';
+// import Footer from './Footer';
 import CartDrawer from './CartDrawer';
 import AuthModal from './AuthModal';
 import QuoteModal from './QuoteModal';
@@ -22,6 +22,8 @@ import {
 import { BookPublishingPage } from './ui/CategoryShop';
 import { useProductStore } from '@/store/productStore';
 import { useUserRoleStore } from '@/store/authRole';
+import Footer from '../Home/Footer';
+import Map from '../Home/Map';
 
 function Router() {
   const page = useStore(s => s.route.page);
@@ -67,16 +69,17 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, [getUserRole, fetchProducts, init]);
 
-  const isAdmin = route.page === 'admin';
+  // const isAdmin = route.page === 'admin';
   const isDesignTool = route.page === 'design-tool';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      {!isAdmin && !isDesignTool && <Header />}
+      {!isDesignTool && <Header />}
       <main>
         <Router />
       </main>
-      {!isAdmin && !isDesignTool && <Footer />}
+      <Map/>
+      {!isDesignTool && <Footer />}
 
       {/* Overlays */}
       <CartDrawer />

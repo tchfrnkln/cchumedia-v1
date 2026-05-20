@@ -195,7 +195,7 @@ export default function ProductPage() {
 
             {/* Configurator */}
             <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-5 space-y-4 mb-6 border border-gray-100 dark:border-gray-800">
-              <h3 className="font-display font-black text-sm uppercase tracking-wider text-gray-500">Configure Your Order</h3>
+              <h3 className="font-display font-black text-sm uppercase tracking-wider text-gray-500">Place an Order</h3>
               {
                 spec && Object.entries(spec).map(([key, options]) => (
                   <div key={key}>
