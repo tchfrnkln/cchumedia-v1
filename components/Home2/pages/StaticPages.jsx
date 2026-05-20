@@ -99,7 +99,7 @@ export function TrackPage() {
   const { user, getUserOrders } = useStore();
   const orders = user ? getUserOrders() : [];
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-6 py-10 animate-fade-in min-h-screen">
       <h1 className="font-display font-black text-3xl mb-2">📦 Track Your Order</h1>
       <p className="text-gray-400 mb-6">Enter your order ID or check your account orders below.</p>
       <div className="flex gap-2 mb-8">
@@ -134,7 +134,7 @@ export function StarterKitsPage() {
     { name: 'Event Essentials Kit', icon: '🎪', price: 75000, items: ['2×2m Backdrop', 'Pull-up Banner', '50 Conference Tags', '100 Programme Booklets'], badge: 'Best Value' }
   ];
   return (
-    <div className="w-full mx-auto px-6 py-10 animate-fade-in">
+    <div className="w-full mx-auto px-6 py-10 animate-fade-in min-h-screen">
       <div className="text-center mb-10">
         <h1 className="font-display font-black text-3xl mb-2">🚀 Starter Kits</h1>
         <p className="text-gray-400">Everything you need to launch your brand — bundled and discounted.</p>
@@ -165,7 +165,7 @@ export function EarnPage() {
   const affLink = `${window.location.origin}/auth/new?aff=${profile?.affiliate_id}`;
   
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 animate-fade-in">
+    <div className="max-w-3xl mx-auto px-6 py-10 animate-fade-in min-h-screen">
       <div className="text-center mb-8">
         <h1 className="font-display font-black text-3xl mb-2">💰 Earn with PrintHub</h1>
         <p className="text-gray-400">Refer clients, earn commissions, and grow with us.</p>
@@ -389,11 +389,11 @@ export const CampaignMaterialsPage = () => {
               Flyers, banners, apparel and more for your campaign
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {products.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
-          </div>
+          </div> */}
         </section>
 
         {/* ── RUSH BANNER ── */}

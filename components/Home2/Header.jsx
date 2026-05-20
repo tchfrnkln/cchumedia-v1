@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Heart, User, ShoppingBag, MessageCircle, Sun, Moon, ChevronDown, Menu, X } from 'lucide-react';
 import { useStore } from '../../lib/store';
-import { CATEGORIES, CONFIG, PRODUCTS } from '../../lib/data';
+import { CATEGORIES, CONFIG, PRODUCTS, navLinks } from '../../lib/data';
 import Button from './ui/Button';
 import { useAuthStore } from '@/store/authStore';
 import { useUserRoleStore } from '@/store/authRole';
@@ -31,18 +31,6 @@ export default function Header() {
       setSearchVal('');
     }
   };
-
-  const navLinks = [
-    { page: 'home', label: '🏠 Home' },
-    { page: 'kits', label: '🚀 Starter Kits' },
-    { page: 'campaign', label: '🗳️ Campaign' },
-    { page: 'publishing', label: '📚 Publishing' },
-    { page: 'design-tool', label: '🎨 Design Online' },
-    { page: 'earn', label: '💰 Earn' },
-    { page: 'track', label: '📦 Track' },
-    { page: 'faq', label: '❓ FAQ' },
-    { page: 'contact', label: '📞 Contact' }
-  ];
 
   const { logout } = useAuthStore();
 
@@ -146,30 +134,10 @@ export default function Header() {
                 {/* Wishlist */}
                 <button
                   onClick={() => navigate('wishlist')}
-                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors hidden"
                 >
                   <Heart size={18} />
                 </button>
-
-                {/* Account */}
-                {user ? (
-                  <button
-                    onClick={() => navigate('account')}
-                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
-                  >
-                    <User size={18} />
-                    {role == 'admin' && (
-                      <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-brand rounded-full text-[7px] text-white font-bold flex items-center justify-center">A</span>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => openModal('auth')}
-                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    <User size={18} />
-                  </button>
-                )}
 
                 {/* WhatsApp */}
                 <a
@@ -193,6 +161,28 @@ export default function Header() {
                     </span>
                   )}
                 </button>
+
+                {/* Account */}
+                {role ? (
+                  <button
+                    onClick={() => navigate('account')}
+                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+                  >
+                    <User size={18} />
+                    {role == 'admin' ?
+                      <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-brand rounded-full text-[7px] text-white font-bold flex items-center justify-center">A</span>:
+                      <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-brand rounded-full text-[7px] text-white font-bold flex items-center justify-center">U</span>
+                    }
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => openModal('auth')}
+                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center border border-gray-600 dark:border-gray-200 cursor-pointer"
+                  >
+                    <p className="text-xs mr-1 font-bold">Login</p>
+                    <User size={14} />
+                  </button>
+                )}
 
                 {/* CTA */}
                 <Button size="sm" onClick={() => openModal('quote')} className="hidden md:inline-flex ml-1">
@@ -225,7 +215,10 @@ export default function Header() {
               {navLinks.map(link => (
                 <button
                   key={link.page}
-                  onClick={() => navigate(link.page)}
+                  onClick={() => {
+                    if(!link?.url) return navigate(link.page)
+                    window.open(link.url, '_blank')  
+                  }}
                   className={`px-3 py-2 text-xs font-display font-bold whitespace-nowrap rounded-lg transition-colors ${route.page === link.page ? 'bg-red-50 dark:bg-red-950 text-brand' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand'}`}
                 >
                   {link.label}

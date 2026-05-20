@@ -147,7 +147,7 @@ export default function ProductPage() {
             </div>:
             <div className="flex gap-2 mb-6">
               {[product.image_url, product.image_url, product.image_url].map((ic, i) => (
-                <Image src={ic} alt={product.name}  key={i} className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl cursor-pointer border-2 transition-all object-contain`} width={64} height={64}/>
+                ic && <Image src={ic} alt={product.name}  key={i} className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl cursor-pointer border-2 transition-all object-contain`} width={64} height={64}/>
               ))}
             </div>}
 

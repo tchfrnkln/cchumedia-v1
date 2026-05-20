@@ -27,7 +27,7 @@ export default function LoginPage() {
       if((redirect !== null) && (redirect !== 'null')) {
         window.location.href = '/dashboard/checkout';
       } else{
-        window.location.href = '/dashboard';
+        window.location.href = '/?page=shop';
       }
     } catch {
       setLoading(false);

@@ -317,7 +317,7 @@ export default function CheckoutPage() {
     reference,
     email: contact.email.trim(),
     amount: Math.round(total * 100),
-    publicKey: 'pk_test_a361ebecc9edf1b3af278b0b42e9b037a668c872',
+    publicKey: 'pk_live_6a5b4d4bac7d3872867f76a55908eff4b8111d39',
     currency: 'NGN',
     firstname: contact.name.trim(),
     lastname: '',

@@ -24,6 +24,8 @@ import { useProductStore } from '@/store/productStore';
 import { useUserRoleStore } from '@/store/authRole';
 import Footer from '../Home/Footer';
 import Map from '../Home/Map';
+import { navLinks } from '../../lib/data';
+
 
 function Router() {
   const page = useStore(s => s.route.page);
@@ -48,7 +50,7 @@ function Router() {
 }
 
 export default function App() {
-  const { init, route } = useStore();
+  const { init, route, navigate } = useStore();
   const {fetchProducts} = useProductStore();
   const { getUserRole } = useUserRoleStore();
   
@@ -69,17 +71,49 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, [getUserRole, fetchProducts, init]);
 
-  // const isAdmin = route.page === 'admin';
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      let targetPage = null;
+
+      if (params.has('page')) {
+        targetPage = params.get('page');
+      } else{
+        for (const { page } of navLinks) {
+          if (params.has(page)) {
+            targetPage = page;
+            break;
+          }
+        }
+      }
+
+      if (targetPage && navLinks.some(link => link.page === targetPage)) {
+        navigate(targetPage);
+      }
+    };
+
+    // Run on initial load
+    handleUrlChange();
+
+    // Listen for back/forward browser navigation
+    window.addEventListener('popstate', handleUrlChange);
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [navigate]); 
+
+  const isAdmin = route.page === 'admin';
   const isDesignTool = route.page === 'design-tool';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      {!isDesignTool && <Header />}
+      {!isAdmin && !isDesignTool && <Header />}
       <main>
         <Router />
       </main>
       <Map/>
-      {!isDesignTool && <Footer />}
+      {!isAdmin && !isDesignTool && <Footer />}
 
       {/* Overlays */}
       <CartDrawer />

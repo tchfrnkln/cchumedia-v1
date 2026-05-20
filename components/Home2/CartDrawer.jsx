@@ -47,7 +47,7 @@ export default function CartDrawer() {
             <div className="p-4 space-y-3">
               {cart.map(item => (
                 <div key={item.cartId} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-                  <Image className="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-2xl shrink-0" src={item.image} alt={item.name} width={56} height={56} />
+                  <Image className="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-2xl shrink-0" src={item?.image} alt={item?.name} width={56} height={56} />
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sm leading-tight line-clamp-2">{item.name}</p>
                     {item.config?.size && <p className="text-xs text-gray-400 mt-0.5">{item.config.size} · {item.config.material}</p>}
@@ -70,7 +70,7 @@ export default function CartDrawer() {
                           <Plus size={12} />
                         </button>
                       </div>
-                      <span className="font-display font-black text-brand text-sm">{`${formatNaira(item.total)}`}<p className="text-[8px] text-white font-normal">{item.designData.type ==='design-for-me' ? ' + Design Fee(5k)' : ''}</p></span>
+                      <span className="font-display font-black text-brand text-sm">{`${formatNaira(item.total)}`}<p className="text-[8px] text-white font-normal hidden">{item.designData.type ==='design-for-me' ? ' + Design Fee(5k)' : ''}</p></span>
                     </div>
                   </div>
                   <button
@@ -92,7 +92,7 @@ export default function CartDrawer() {
               <span className="text-sm text-gray-500">Subtotal</span>
               <span className="font-display font-black text-xl text-brand">{formatNaira(total)}</span>
             </div>
-            <p className="text-xs text-gray-400">Delivery fee calculated at checkout</p>
+            <p className="text-xs text-gray-400">Delivery and Design fees calculated at checkout</p>
             <Button
               className="w-full"
               onClick={() => { navigate('checkout'); closeModal(); }}

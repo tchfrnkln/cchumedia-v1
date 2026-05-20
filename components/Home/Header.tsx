@@ -47,7 +47,7 @@ export function Header2() {
 
       <div className="flex items-center gap-3 text-sm">
         {!role && <Link href="/auth" className="hover:border-[1px] hover:border-[var(--cchu-red)] p-2 px-4 rounded-sm">Login</Link>}
-        <Link href="/dashboard" className="bg-(--cchu-red) text-white font-bold p-2 rounded-sm transform hover:translate-y-[-4px]">Order Now →</Link>
+        <Link href="/?page=shop" target='_blank' className="bg-(--cchu-red) text-white font-bold p-2 rounded-sm transform hover:translate-y-[-4px]">Order Now →</Link>
       </div>
     </nav>
   );
